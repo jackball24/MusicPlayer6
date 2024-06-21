@@ -10,11 +10,7 @@ import java.io.File
 import java.io.IOException
 
 
-/**
- * Rewrite of jerickson314's great SD Scanner for Lollipop as utility class
- * TODO: well why is it not working?
- * https://github.com/jerickson314/sdscanner/blob/master/src/com/gmail/jerickson314/sdscanner/ScanFragment.java
- */
+
 class SdScanner(private val context: Context) {
 	var progressFrequencyMs = 250
 	val progress = SimpleProgress()
