@@ -19,6 +19,7 @@ package org.akanework.gramophone.ui
 
 import android.app.NotificationManager
 import android.content.pm.PackageManager
+import android.os.Build
 import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
@@ -142,43 +143,60 @@ class MainActivity : AppCompatActivity() {
         ViewCompat.setOnApplyWindowInsetsListener(container) { _, insets ->
             playerBottomSheet.generateBottomSheetInsets(insets)
         }
+        
+        // 检查并请求所有权限
+        checkAndRequestPermissions()
 
-        // Check all permissions.
-        if ((hasScopedStorageWithMediaTypes()
-                    && ContextCompat.checkSelfPermission(
-                this,
-                android.Manifest.permission.READ_MEDIA_AUDIO,
-            ) != PackageManager.PERMISSION_GRANTED)
-            || (!hasScopedStorageV2()
-                    && ContextCompat.checkSelfPermission(
-                this,
-                android.Manifest.permission.WRITE_EXTERNAL_STORAGE,
-            ) != PackageManager.PERMISSION_GRANTED)
-            || (!hasScopedStorageWithMediaTypes()
-                    && ContextCompat.checkSelfPermission(
-                this,
-                android.Manifest.permission.READ_EXTERNAL_STORAGE,
-            ) != PackageManager.PERMISSION_GRANTED)
+    }
+
+
+    private fun checkAndRequestPermissions() {
+        val permissionsNeeded = mutableListOf<String>()
+
+        // Android 13 及以上版本需要请求通知权限
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU &&
+            ContextCompat.checkSelfPermission(
+                this, android.Manifest.permission.POST_NOTIFICATIONS
+            ) != PackageManager.PERMISSION_GRANTED
         ) {
-            // Ask if was denied.
+            permissionsNeeded.add(android.Manifest.permission.POST_NOTIFICATIONS)
+        }
+
+        // Android 11 及以上版本需要请求媒体权限
+        if (hasScopedStorageWithMediaTypes() &&
+            ContextCompat.checkSelfPermission(
+                this, android.Manifest.permission.READ_MEDIA_AUDIO
+            ) != PackageManager.PERMISSION_GRANTED
+        ) {
+            permissionsNeeded.add(android.Manifest.permission.READ_MEDIA_AUDIO)
+        } else if (!hasScopedStorageV2() &&
+            ContextCompat.checkSelfPermission(
+                this, android.Manifest.permission.WRITE_EXTERNAL_STORAGE
+            ) != PackageManager.PERMISSION_GRANTED
+        ) {
+            permissionsNeeded.add(android.Manifest.permission.WRITE_EXTERNAL_STORAGE)
+        } else if (!hasScopedStorageWithMediaTypes() &&
+            ContextCompat.checkSelfPermission(
+                this, android.Manifest.permission.READ_EXTERNAL_STORAGE
+            ) != PackageManager.PERMISSION_GRANTED
+        ) {
+            permissionsNeeded.add(android.Manifest.permission.READ_EXTERNAL_STORAGE)
+        }
+
+
+        if (permissionsNeeded.isNotEmpty()) {
             ActivityCompat.requestPermissions(
                 this,
-                if (hasScopedStorageWithMediaTypes())
-                    arrayOf(android.Manifest.permission.READ_MEDIA_AUDIO)
-                else if (hasScopedStorageV2())
-                    arrayOf(android.Manifest.permission.READ_EXTERNAL_STORAGE)
-                else
-                    arrayOf(
-                        android.Manifest.permission.READ_EXTERNAL_STORAGE,
-                        android.Manifest.permission.WRITE_EXTERNAL_STORAGE
-                    ),
-                PERMISSION_READ_MEDIA_AUDIO,
+                permissionsNeeded.toTypedArray(),
+                PERMISSION_READ_MEDIA_AUDIO
             )
         } else {
-            // If all permissions are granted, we can update library now.
+            // 如果所有权限都已授予，则更新库
             if (libraryViewModel.mediaItemList.value == null) {
                 updateLibrary()
-            } else reportFullyDrawn() // <-- when recreating activity due to rotation
+            } else {
+                reportFullyDrawn() // <-- 当由于旋转重新创建活动时
+            }
         }
     }
 
@@ -206,9 +224,15 @@ class MainActivity : AppCompatActivity() {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults)
 
         if (requestCode == PERMISSION_READ_MEDIA_AUDIO) {
-            if (grantResults.isNotEmpty() &&
-                grantResults[0] == PackageManager.PERMISSION_GRANTED
-            ) {
+            var allPermissionsGranted = true
+            for (result in grantResults) {
+                if (result != PackageManager.PERMISSION_GRANTED) {
+                    allPermissionsGranted = false
+                    break
+                }
+            }
+
+            if (allPermissionsGranted) {
                 updateLibrary()
             } else {
                 reportFullyDrawn()
