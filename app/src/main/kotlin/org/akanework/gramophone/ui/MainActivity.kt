@@ -143,7 +143,7 @@ class MainActivity : AppCompatActivity() {
         ViewCompat.setOnApplyWindowInsetsListener(container) { _, insets ->
             playerBottomSheet.generateBottomSheetInsets(insets)
         }
-        
+
         // 检查并请求所有权限
         checkAndRequestPermissions()
 
