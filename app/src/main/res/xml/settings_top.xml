@@ -62,18 +62,5 @@
         android:summary="@string/settings_player_options_summary"
         android:title="@string/settings_player_options" />
 
-    <Preference
-        android:icon="@drawable/ic_experiment"
-        android:key="experimental"
-        android:layout="@layout/preference_basic"
-        android:summary="@string/settings_experimental_settings_summary"
-        android:title="@string/settings_experimental_settings" />
-
-    <Preference
-        android:icon="@drawable/ic_info"
-        android:key="about"
-        android:layout="@layout/preference_basic"
-        android:summary="@string/settings_about_gramophone"
-        android:title="@string/settings_about_app" />
 
 </PreferenceScreen>

@@ -229,42 +229,6 @@ class SongAdapter(
                 }
 
                 R.id.details -> {
-                    /*
-                    val rootView = MaterialAlertDialogBuilder(mainActivity)
-                        .setView(R.layout.dialog_info_song)
-                        .setBackground(drawable)
-                        .setNeutralButton(R.string.dismiss) { dialog, _ ->
-                            dialog.dismiss()
-                        }
-                        .show()
-                    rootView.findViewById<TextView>(R.id.title)!!.text = item.mediaMetadata.title
-                    rootView.findViewById<TextView>(R.id.artist)!!.text = item.mediaMetadata.artist
-                    rootView.findViewById<TextView>(R.id.album)!!.text =
-                        item.mediaMetadata.albumTitle
-                    if (!item.mediaMetadata.albumArtist.isNullOrBlank()) {
-                        rootView.findViewById<TextView>(R.id.album_artist)!!.text =
-                            item.mediaMetadata.albumArtist
-                    }
-                    rootView.findViewById<TextView>(R.id.track_number)!!.text =
-                        item.mediaMetadata.trackNumber.toString()
-                    rootView.findViewById<TextView>(R.id.disc_number)!!.text =
-                        item.mediaMetadata.discNumber.toString()
-                    val year = item.mediaMetadata.releaseYear?.toString()
-                    if (year != null) {
-                        rootView.findViewById<TextView>(R.id.year)!!.text = year
-                    }
-                    val genre = item.mediaMetadata.genre?.toString()
-                    if (genre != null) {
-                        rootView.findViewById<TextView>(R.id.genre)!!.text = genre
-                    }
-                    rootView.findViewById<TextView>(R.id.path)!!.text =
-                        item.getFile()?.path
-                    rootView.findViewById<TextView>(R.id.mime)!!.text =
-                        item.mediaMetadata.extras!!.getString("MimeType")
-                    rootView.findViewById<TextView>(R.id.duration)!!.text =
-                        convertDurationToTimeStamp(item.mediaMetadata.extras!!.getLong("Duration"))
-
-                     */
                     val position = viewModel.mediaItemList.value?.indexOfFirst {
                         it.mediaId == item.mediaId
                     }
@@ -274,51 +238,7 @@ class SongAdapter(
                     true
                 }
 
-                /*R.id.delete -> {
-                    val doDelete: (() -> (() -> Pair<IntentSender?, () -> Boolean>)) -> Unit = { r ->
-                        val res = r()()
-                        if (res.first == null) {
-                            res.second()
-                        } else {
-                            if (mainActivity.intentSenderAction == null) {
-                                mainActivity.intentSenderAction = res.second
-                                mainActivity.intentSender.launch(
-                                    IntentSenderRequest.Builder(res.first!!).build()
-                                )
-                            } else {
-                                Toast.makeText(
-                                    context, context.getString(
-                                        R.string.delete_in_progress
-                                    ), Toast.LENGTH_LONG
-                                ).show()
-                            }
-                        }
-                    }
-                    val res = MediaStoreUtils.deleteSong(context, item)
-                    if (res.first) {
-                        AlertDialog.Builder(context)
-                            .setTitle(R.string.delete)
-                            .setMessage(item.mediaMetadata.title)
-                            .setPositiveButton(R.string.yes) { _, _ ->
-                                doDelete(res.second)
-                            }
-                            .setNegativeButton(R.string.no) { _, _ -> }
-                            .show()
-                    } else {
-                        doDelete(res.second)
-                    }
-                    true
-                }*/
 
-                /*
-				R.id.share -> {
-					val builder = ShareCompat.IntentBuilder(mainActivity)
-					val mimeTypes = mutableSetOf<String>()
-					builder.addStream(viewModel.fileUriList.value?.get(songList[holder.bindingAdapterPosition].mediaId.toLong())!!)
-					mimeTypes.add(viewModel.mimeTypeList.value?.get(songList[holder.bindingAdapterPosition].mediaId.toLong())!!)
-					builder.setType(mimeTypes.singleOrNull() ?: "audio/*").startChooser()
-				 } */
-				 */
                 else -> false
             }
         }
@@ -352,11 +272,8 @@ class SongAdapter(
         types: Set<Sorter.Type> = setOf(
             Sorter.Type.ByTitleDescending, Sorter.Type.ByTitleAscending,
             Sorter.Type.ByArtistDescending, Sorter.Type.ByArtistAscending,
-            Sorter.Type.ByAlbumTitleDescending, Sorter.Type.ByAlbumTitleAscending,
             Sorter.Type.ByAlbumArtistDescending, Sorter.Type.ByAlbumArtistAscending,
             Sorter.Type.ByAddDateDescending, Sorter.Type.ByAddDateAscending,
-            Sorter.Type.ByReleaseDateDescending, Sorter.Type.ByReleaseDateAscending,
-            Sorter.Type.ByModifiedDateDescending, Sorter.Type.ByModifiedDateAscending,
             Sorter.Type.ByDiscAndTrack
         )
     ) : Sorter.Helper<MediaItem>(types) {

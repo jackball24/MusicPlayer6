@@ -53,16 +53,6 @@ class MainSettingsTopFragment : BasePreferenceFragment() {
                     .commit()
             }
 
-            "about" -> {
-                val supportFragmentManager = requireActivity().supportFragmentManager
-                supportFragmentManager
-                    .beginTransaction()
-                    .addToBackStack(System.currentTimeMillis().toString())
-                    .hide(supportFragmentManager.fragments.let { it[it.size - 1] })
-                    .add(R.id.container, AboutSettingsFragment())
-                    .commit()
-            }
-
             "player" -> {
                 val supportFragmentManager = requireActivity().supportFragmentManager
                 supportFragmentManager
@@ -83,15 +73,7 @@ class MainSettingsTopFragment : BasePreferenceFragment() {
                     .commit()
             }
 
-            "experimental" -> {
-                val supportFragmentManager = requireActivity().supportFragmentManager
-                supportFragmentManager
-                    .beginTransaction()
-                    .addToBackStack(System.currentTimeMillis().toString())
-                    .hide(supportFragmentManager.fragments.let { it[it.size - 1] })
-                    .add(R.id.container, ExperimentalSettingsFragment())
-                    .commit()
-            }
+
         }
         return super.onPreferenceTreeClick(preference)
     }

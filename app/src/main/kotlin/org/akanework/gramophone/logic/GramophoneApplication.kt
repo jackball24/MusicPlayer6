@@ -43,7 +43,6 @@ import coil3.request.NullRequestDataException
 import coil3.size.pxOrElse
 import coil3.util.Logger
 import org.akanework.gramophone.BuildConfig
-import org.akanework.gramophone.logic.ui.BugHandlerActivity
 import java.io.File
 import java.io.IOException
 import kotlin.system.exitProcess
@@ -66,11 +65,6 @@ class GramophoneApplication : Application(), SingletonImageLoader.Factory {
             val exceptionMessage = Log.getStackTraceString(paramThrowable)
             val threadName = Thread.currentThread().name
             Log.e(TAG, "Error on thread $threadName:\n $exceptionMessage")
-            val intent = Intent(this, BugHandlerActivity::class.java)
-            intent.putExtra("exception_message", exceptionMessage)
-            intent.putExtra("thread", threadName)
-            intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK
-            startActivity(intent)
 
             exitProcess(10)
         }

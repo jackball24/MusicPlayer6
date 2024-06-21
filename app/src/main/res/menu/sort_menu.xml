@@ -30,12 +30,14 @@
             android:id="@+id/album"
             android:orderInCategory="3"
             android:title="@string/sort_by_album"
+            android:visible="false"
             app:showAsAction="never" />
         <item
             android:id="@+id/size"
             android:checked="false"
             android:orderInCategory="4"
             android:title="@string/sort_by_size"
+            android:visible="false"
             app:showAsAction="never" />
         <item
             android:id="@+id/add_date"
@@ -48,12 +50,14 @@
             android:checked="false"
             android:orderInCategory="6"
             android:title="@string/sort_by_release_date"
+            android:visible="false"
             app:showAsAction="never" />
         <item
             android:id="@+id/mod_date"
             android:checked="false"
             android:orderInCategory="7"
             android:title="@string/sort_by_modified_date"
+            android:visible="false"
             app:showAsAction="never" />
     </group>
 
