@@ -9,6 +9,7 @@
 
         <SeekBarPreference
             android:defaultValue="@integer/filter_default_sec"
+            app:isPreferenceVisible="false"
             android:key="mediastore_filter"
             android:layout="@layout/preference_seekbar"
             android:max="120"
@@ -27,10 +28,12 @@
 
     <PreferenceCategory
         android:layout="@layout/preference_category_md"
+        app:isPreferenceVisible="false"
         android:title="@string/settings_category_misc">
 
         <SwitchPreferenceCompat
             android:defaultValue="false"
+            app:isPreferenceVisible="false"
             android:key="autoplay"
             android:layout="@layout/preference_switch"
             android:summary="@string/settings_play_on_launch_summary"
@@ -40,6 +43,7 @@
 
         <SwitchPreferenceCompat
             android:defaultValue="false"
+            app:isPreferenceVisible="false"
             android:key="trim_lyrics"
             android:layout="@layout/preference_switch"
             android:title="@string/settings_trim_lyrics"
@@ -49,6 +53,7 @@
         <SwitchPreferenceCompat
             android:defaultValue="false"
             android:key="album_covers"
+            app:isPreferenceVisible="false"
             android:layout="@layout/preference_switch"
             android:summary="@string/album_covers_enhance_desc"
             android:title="@string/album_covers_enhance"

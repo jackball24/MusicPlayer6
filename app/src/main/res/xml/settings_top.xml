@@ -39,12 +39,6 @@
         android:title="@string/settings_customization"
         app:isPreferenceVisible="false" />
 
-    <Preference
-        android:icon="@drawable/ic_headphones"
-        android:key="audio"
-        android:layout="@layout/preference_basic"
-        android:summary="@string/settings_player_options_summary"
-        android:title="@string/settings_player_options" />
 
 
 </PreferenceScreen>
