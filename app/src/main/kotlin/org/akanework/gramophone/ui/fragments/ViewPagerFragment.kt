@@ -63,20 +63,6 @@ class ViewPagerFragment : BaseFragment(true) {
                 R.id.search -> {
                     (requireActivity() as MainActivity).startFragment(SearchFragment())
                 }
-                R.id.equalizer -> {
-                    val intent = Intent("android.media.action.DISPLAY_AUDIO_EFFECT_CONTROL_PANEL")
-                        .addCategory("android.intent.category.CATEGORY_CONTENT_MUSIC")
-                    try {
-                        (requireActivity() as MainActivity).startingActivity.launch(intent)
-                    } catch (e: ActivityNotFoundException) {
-                        // Let's show a toast here if no system inbuilt EQ was found.
-                        Toast.makeText(
-                            requireContext(),
-                            R.string.equalizer_not_found,
-                            Toast.LENGTH_LONG
-                        ).show()
-                    }
-                }
                 R.id.refresh -> {
                     val activity = requireActivity() as MainActivity
                     val playerLayout = activity.playerBottomSheet

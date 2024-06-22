@@ -52,8 +52,8 @@
             app:tabIndicatorFullWidth="true"
             app:tabIndicatorGravity="stretch"
             app:tabMinWidth="0dp"
-            app:tabMode="scrollable"
-            app:tabGravity="start"
+            app:tabMode="fixed"
+            app:tabGravity="fill"
             app:tabPaddingEnd="12dp"
             app:tabPaddingStart="12dp"
             app:tabRippleColor="@android:color/transparent"
@@ -69,22 +69,7 @@
             <com.google.android.material.tabs.TabItem
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="@string/category_albums" />
-
-            <com.google.android.material.tabs.TabItem
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
                 android:text="@string/category_artists" />
-
-            <com.google.android.material.tabs.TabItem
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="@string/category_genres" />
-
-            <com.google.android.material.tabs.TabItem
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="@string/category_dates" />
 
             <com.google.android.material.tabs.TabItem
                 android:layout_width="wrap_content"
