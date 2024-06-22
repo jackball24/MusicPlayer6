@@ -464,15 +464,15 @@ class FullBottomSheet(context: Context, attrs: AttributeSet?, defStyleAttr: Int,
 	}
 
 	private fun refreshSettings(key: String?) {
-		if (key == null || key == "default_progress_bar") {
-			if (prefs.getBooleanStrict("default_progress_bar", true)) {
-				bottomSheetFullSlider.visibility = View.GONE
-				bottomSheetFullSeekBar.visibility = View.VISIBLE
-			} else {
+//		if (key == null || key == "default_progress_bar") {
+//			if (prefs.getBooleanStrict("default_progress_bar", true)) {
+//				bottomSheetFullSlider.visibility = View.GONE
+//				bottomSheetFullSeekBar.visibility = View.VISIBLE
+//			} else {
 				bottomSheetFullSlider.visibility = View.VISIBLE
 				bottomSheetFullSeekBar.visibility = View.GONE
-			}
-		}
+//			}
+//		}
 		if (key == null || key == "centered_title") {
 			if (prefs.getBooleanStrict("centered_title", true)) {
 				bottomSheetFullTitle.gravity = Gravity.CENTER
