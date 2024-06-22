@@ -2,12 +2,16 @@ package org.akanework.gramophone.ui.components
 
 import android.animation.ValueAnimator
 import android.annotation.SuppressLint
+import android.content.BroadcastReceiver
 import android.content.Context
+import android.content.Intent
+import android.content.IntentFilter
 import android.content.SharedPreferences
 import android.content.res.ColorStateList
 import android.graphics.Bitmap
 import android.graphics.drawable.BitmapDrawable
 import android.graphics.drawable.TransitionDrawable
+import android.media.AudioManager
 import android.text.format.DateFormat
 import android.util.AttributeSet
 import android.util.Size
@@ -111,6 +115,12 @@ class FullBottomSheet(context: Context, attrs: AttributeSet?, defStyleAttr: Int,
 	private var isUserTracking = false
 	private var runnableRunning = false
 	private var firstTime = false
+	// 添加AudioManager变量
+	private val audioManager: AudioManager = context.getSystemService(Context.AUDIO_SERVICE) as AudioManager
+
+	// 初始化音量相关的变量
+	private val maxVolume = audioManager.getStreamMaxVolume(AudioManager.STREAM_MUSIC)
+	private val currentVolume = audioManager.getStreamVolume(AudioManager.STREAM_MUSIC)
 
 	private val prefs = PreferenceManager.getDefaultSharedPreferences(context)
 
@@ -162,6 +172,28 @@ class FullBottomSheet(context: Context, attrs: AttributeSet?, defStyleAttr: Int,
 			isUserTracking = false
 		}
 	}
+	private val volumeSeekBarChangeListener = object : SeekBar.OnSeekBarChangeListener {
+		override fun onProgressChanged(seekBar: SeekBar?, progress: Int, fromUser: Boolean) {
+			if (fromUser) {
+				audioManager.setStreamVolume(AudioManager.STREAM_MUSIC, progress, 0)
+			}
+		}
+
+		override fun onStartTrackingTouch(seekBar: SeekBar?) {}
+
+		override fun onStopTrackingTouch(seekBar: SeekBar?) {}
+	}
+
+	// 定义BroadcastReceiver来监听音量变化
+	private val volumeReceiver = object : BroadcastReceiver() {
+		override fun onReceive(context: Context?, intent: Intent?) {
+			if (intent?.action == "android.media.VOLUME_CHANGED_ACTION") {
+				val newVolume = audioManager.getStreamVolume(AudioManager.STREAM_MUSIC)
+				bottomSheetVolumeSeekBar.progress = newVolume
+			}
+		}
+	}
+
 	private val bottomSheetFullCover: ImageView
 	private val bottomSheetFullTitle: TextView
 	private val bottomSheetFullSubtitle: TextView
@@ -177,6 +209,7 @@ class FullBottomSheet(context: Context, attrs: AttributeSet?, defStyleAttr: Int,
 	private val bottomSheetFavoriteButton: MaterialButton
 	val bottomSheetLyricButton: MaterialButton
 	private val bottomSheetFullSeekBar: SeekBar
+	private val bottomSheetVolumeSeekBar:SeekBar
 	private val bottomSheetFullSlider: Slider
 	private val bottomSheetFullCoverFrame: MaterialCardView
 	val bottomSheetFullLyricRecyclerView: RecyclerView
@@ -205,6 +238,7 @@ class FullBottomSheet(context: Context, attrs: AttributeSet?, defStyleAttr: Int,
 		bottomSheetFullPosition = findViewById(R.id.position)
 		bottomSheetFullDuration = findViewById(R.id.duration)
 		bottomSheetFullSeekBar = findViewById(R.id.slider_squiggly)
+		bottomSheetVolumeSeekBar = findViewById(R.id.volume)
 		bottomSheetFullSlider = findViewById(R.id.slider_vert)
 		bottomSheetFullSlideUpButton = findViewById(R.id.slide_down)
 		bottomSheetShuffleButton = findViewById(R.id.sheet_random)
@@ -213,6 +247,15 @@ class FullBottomSheet(context: Context, attrs: AttributeSet?, defStyleAttr: Int,
 		bottomSheetPlaylistButton = findViewById(R.id.playlist)
 		bottomSheetLyricButton = findViewById(R.id.lyrics)
 		bottomSheetFullLyricRecyclerView = findViewById(R.id.lyric_frame)
+		// 初始化音量SeekBar
+		bottomSheetVolumeSeekBar.max = maxVolume
+		bottomSheetVolumeSeekBar.progress = currentVolume
+		bottomSheetVolumeSeekBar.setOnSeekBarChangeListener(volumeSeekBarChangeListener)
+
+		// 注册音量变化的BroadcastReceiver
+		val filter = IntentFilter("android.media.VOLUME_CHANGED_ACTION")
+		context.registerReceiver(volumeReceiver, filter)
+
 		fullPlayerFinalColor = MaterialColors.getColor(
 			this,
 			com.google.android.material.R.attr.colorSurface
@@ -431,21 +474,15 @@ class FullBottomSheet(context: Context, attrs: AttributeSet?, defStyleAttr: Int,
 				Player.MEDIA_ITEM_TRANSITION_REASON_PLAYLIST_CHANGED
 			)
 			firstTime = false
-			/*
-			if (activity.libraryViewModel.playlistList.value!![MediaStoreUtils.favPlaylistPosition]
-					.songList.contains(instance.currentMediaItem)) {
-				bottomSheetFavoriteButton.isChecked = true
-				// TODO
-			} else {
-				bottomSheetFavoriteButton.isChecked = false
-				// TODO
-			}
 
-			 */
 		}
 	}
 
-
+	// 取消注册BroadcastReceiver
+	override fun onDetachedFromWindow() {
+		super.onDetachedFromWindow()
+		context.unregisterReceiver(volumeReceiver)
+	}
 	override fun onSharedPreferenceChanged(sharedPreferences: SharedPreferences?, key: String?) {
 		if (key == "color_accuracy" || key == "content_based_color") {
 			if (DynamicColors.isDynamicColorAvailable() &&
