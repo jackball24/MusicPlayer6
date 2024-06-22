@@ -13,6 +13,7 @@
             android:key="album_round_corner"
             android:layout="@layout/preference_seekbar"
             android:max="28"
+            app:isPreferenceVisible="false"
             android:summary="@string/settings_album_round_corner_summary"
             android:title="@string/settings_album_round_corner"
             app:showSeekBarValue="true" />
@@ -21,6 +22,7 @@
             android:defaultValue="true"
             android:icon="@drawable/ic_text_fields"
             android:key="bold_title"
+            app:isPreferenceVisible="false"
             android:layout="@layout/preference_switch"
             android:summary="@string/settings_title_bold_summary"
             android:title="@string/settings_title_bold"
@@ -30,6 +32,7 @@
             android:defaultValue="true"
             android:icon="@drawable/ic_format_align_center"
             android:key="centered_title"
+            app:isPreferenceVisible="false"
             android:layout="@layout/preference_switch"
             android:summary="@string/settings_title_center_summary"
             android:title="@string/settings_title_center"
@@ -39,25 +42,21 @@
             android:defaultValue="true"
             android:icon="@drawable/ic_colors"
             android:key="content_based_color"
+            app:isPreferenceVisible="false"
             android:layout="@layout/preference_switch"
             android:summary="@string/settings_content_based_color_summary"
             android:title="@string/settings_content_based_color"
             android:widgetLayout="@layout/preference_switch_widget" />
 
         <SwitchPreferenceCompat
-            android:defaultValue="false"
+            android:defaultValue="true"
             android:icon="@drawable/ic_draw_abstract"
             android:key="default_progress_bar"
+            app:isPreferenceVisible="false"
             android:layout="@layout/preference_switch"
             android:summary="@string/settings_default_progress_bar_summary"
             android:title="@string/settings_default_progress_bar"
             android:widgetLayout="@layout/preference_switch_widget" />
-
-    </PreferenceCategory>
-
-    <PreferenceCategory
-        android:layout="@layout/preference_category_md"
-        android:title="@string/settings_category_misc">
 
         <Preference
             android:key="lyrics"

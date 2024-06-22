@@ -13,8 +13,6 @@ class PlayerSettingsFragment : BaseSettingFragment(R.string.settings_player_ui,
 class PlayerSettingsTopFragment : BasePreferenceFragment() {
     override fun onCreatePreferences(savedInstanceState: Bundle?, rootKey: String?) {
         setPreferencesFromResource(R.xml.settings_player, rootKey)
-        findPreference<Preference>("content_based_color")!!
-            .isVisible = DynamicColors.isDynamicColorAvailable()
     }
 
     override fun onPreferenceTreeClick(preference: Preference): Boolean {
