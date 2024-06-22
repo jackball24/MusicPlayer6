@@ -8,34 +8,12 @@
                 android:title="@string/category_songs"
                 app:showAsAction="ifRoom" />
             <item
-                android:id="@+id/albums"
-                android:checkable="true"
-                android:icon="@drawable/album_art"
-                android:title="@string/category_albums"
-                app:showAsAction="ifRoom" />
-            <item
                 android:id="@+id/artists"
                 android:checkable="true"
                 android:icon="@drawable/artist_art"
                 android:title="@string/category_artists"
                 app:showAsAction="ifRoom" />
-            <item
-                android:id="@+id/genres"
-                android:checkable="true"
-                android:icon="@drawable/genres_art"
-                android:title="@string/category_genres"
-                app:showAsAction="ifRoom" />
-            <item
-                android:id="@+id/dates"
-                android:checkable="true"
-                android:icon="@drawable/dates_art"
-                android:title="@string/category_dates"
-                app:showAsAction="ifRoom" />
-            <item
-                android:id="@+id/folders"
-                android:checkable="true"
-                android:title="@string/filesystem"
-                app:showAsAction="ifRoom" />
+
             <item
                 android:id="@+id/detailed_folders"
                 android:checkable="true"
@@ -64,12 +42,7 @@
                 android:icon="@drawable/ic_shuffle"
                 android:title="@string/home_menu_shuffle"
                 app:showAsAction="ifRoom" />
-            <item
-                android:id="@+id/equalizer"
-                android:checkable="false"
-                android:icon="@drawable/ic_equalizer"
-                android:title="@string/home_menu_equalizer"
-                app:showAsAction="ifRoom" />
+
             <item
                 android:id="@+id/search"
                 android:checkable="false"

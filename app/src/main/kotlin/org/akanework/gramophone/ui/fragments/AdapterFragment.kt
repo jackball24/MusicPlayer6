@@ -15,10 +15,8 @@ import org.akanework.gramophone.logic.ui.MyRecyclerView
 import org.akanework.gramophone.ui.LibraryViewModel
 import org.akanework.gramophone.ui.adapters.AlbumAdapter
 import org.akanework.gramophone.ui.adapters.ArtistAdapter
-import org.akanework.gramophone.ui.adapters.DateAdapter
 import org.akanework.gramophone.ui.adapters.DetailedFolderAdapter
 import org.akanework.gramophone.ui.adapters.FolderAdapter
-import org.akanework.gramophone.ui.adapters.GenreAdapter
 import org.akanework.gramophone.ui.adapters.PlaylistAdapter
 import org.akanework.gramophone.ui.adapters.SongAdapter
 
@@ -53,11 +51,7 @@ class AdapterFragment : BaseFragment(null) {
     private fun createAdapter(v: LibraryViewModel): BaseInterface<*> {
         return when (arguments?.getInt("ID", -1)) {
             R.id.songs -> SongAdapter(this, v.mediaItemList, true, null, true)
-            R.id.albums -> AlbumAdapter(this, v.albumItemList)
             R.id.artists -> ArtistAdapter(this, v.artistItemList, v.albumArtistItemList)
-            R.id.genres -> GenreAdapter(this, v.genreItemList)
-            R.id.dates -> DateAdapter(this, v.dateItemList)
-            R.id.folders -> FolderAdapter(this, v.folderStructure)
             R.id.detailed_folders -> DetailedFolderAdapter(this, v.shallowFolderStructure)
             R.id.playlists -> PlaylistAdapter(this, v.playlistList)
             -1, null -> throw IllegalArgumentException("unset ID value")

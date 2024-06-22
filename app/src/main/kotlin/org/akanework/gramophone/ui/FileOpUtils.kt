@@ -3,8 +3,6 @@ package org.akanework.gramophone.ui
 import org.akanework.gramophone.ui.adapters.AlbumAdapter
 import org.akanework.gramophone.ui.adapters.ArtistAdapter
 import org.akanework.gramophone.ui.adapters.BaseAdapter
-import org.akanework.gramophone.ui.adapters.DateAdapter
-import org.akanework.gramophone.ui.adapters.GenreAdapter
 import org.akanework.gramophone.ui.adapters.PlaylistAdapter
 import org.akanework.gramophone.ui.adapters.SongAdapter
 
@@ -18,20 +16,13 @@ when (adapter) {
         1
     }
 
-    is DateAdapter -> {
+
+    is PlaylistAdapter -> {
         2
     }
 
-    is GenreAdapter -> {
-        3
-    }
-
-    is PlaylistAdapter -> {
-        4
-    }
-
     is SongAdapter -> {
-        5
+        3
     }
 
     else -> {

@@ -72,32 +72,6 @@ class GeneralSubFragment : BaseFragment(true) {
                     }
             }
 
-            /*R.id.artist -> {
-                val item = libraryViewModel.artistItemList.value!![position]
-                title = item.title ?: requireContext().getString(R.string.unknown_artist)
-                itemList = item.songList
-            } TODO */
-
-            R.id.genres -> {
-                // Genres
-                val item = libraryViewModel.genreItemList.value!![position]
-                title = item.title ?: requireContext().getString(R.string.unknown_genre)
-                itemList = item.songList
-            }
-
-            R.id.dates -> {
-                // Dates
-                val item = libraryViewModel.dateItemList.value!![position]
-                title = item.title ?: requireContext().getString(R.string.unknown_year)
-                itemList = item.songList
-            }
-
-            /*R.id.album_artist -> {
-                // Album artists
-                val item = libraryViewModel.albumArtistItemList.value!![position]
-                title = item.title ?: requireContext().getString(R.string.unknown_artist)
-                itemList = item.songList
-            } TODO */
 
             R.id.playlist -> {
                 // Playlists
