@@ -174,7 +174,6 @@ class FullBottomSheet(context: Context, attrs: AttributeSet?, defStyleAttr: Int,
 	private val bottomSheetShuffleButton: MaterialButton
 	private val bottomSheetLoopButton: MaterialButton
 	private val bottomSheetPlaylistButton: MaterialButton
-	private val bottomSheetTimerButton: MaterialButton
 	private val bottomSheetFavoriteButton: MaterialButton
 	val bottomSheetLyricButton: MaterialButton
 	private val bottomSheetFullSeekBar: SeekBar
@@ -210,7 +209,6 @@ class FullBottomSheet(context: Context, attrs: AttributeSet?, defStyleAttr: Int,
 		bottomSheetFullSlideUpButton = findViewById(R.id.slide_down)
 		bottomSheetShuffleButton = findViewById(R.id.sheet_random)
 		bottomSheetLoopButton = findViewById(R.id.sheet_loop)
-		bottomSheetTimerButton = findViewById(R.id.timer)
 		bottomSheetFavoriteButton = findViewById(R.id.favor)
 		bottomSheetPlaylistButton = findViewById(R.id.playlist)
 		bottomSheetLyricButton = findViewById(R.id.lyrics)
@@ -252,7 +250,7 @@ class FullBottomSheet(context: Context, attrs: AttributeSet?, defStyleAttr: Int,
 		prefs.registerOnSharedPreferenceChangeListener(this)
 		activity.controllerViewModel.customCommandListeners.addCallback(activity.lifecycle) { _, command, _ ->
 			when (command.customAction) {
-				GramophonePlaybackService.SERVICE_TIMER_CHANGED -> updateTimer()
+
 
 				GramophonePlaybackService.SERVICE_GET_LYRICS -> {
 					val parsedLyrics = instance?.getLyrics()
@@ -313,22 +311,7 @@ class FullBottomSheet(context: Context, attrs: AttributeSet?, defStyleAttr: Int,
 			)
 		}
 
-		bottomSheetTimerButton.setOnClickListener {
-			ViewCompat.performHapticFeedback(it, HapticFeedbackConstantsCompat.CONTEXT_CLICK)
-			val picker =
-				MaterialTimePicker
-					.Builder()
-					.setHour((instance?.getTimer() ?: 0) / 3600 / 1000)
-					.setMinute(((instance?.getTimer() ?: 0) % (3600 * 1000)) / (60 * 1000))
-					.setTimeFormat(TimeFormat.CLOCK_24H)
-					.setInputMode(MaterialTimePicker.INPUT_MODE_KEYBOARD)
-					.build()
-			picker.addOnPositiveButtonClickListener {
-				val destinationTime: Int = picker.hour * 1000 * 3600 + picker.minute * 1000 * 60
-				instance?.setTimer(destinationTime)
-			}
-			picker.show(activity.supportFragmentManager, "timer")
-		}
+
 
 		bottomSheetLoopButton.setOnClickListener {
 			ViewCompat.performHapticFeedback(it, HapticFeedbackConstantsCompat.CONTEXT_CLICK)
@@ -451,7 +434,6 @@ class FullBottomSheet(context: Context, attrs: AttributeSet?, defStyleAttr: Int,
 		activity.controllerViewModel.addControllerCallback(activity.lifecycle) { _, _ ->
 			firstTime = true
 			instance?.addListener(this@FullBottomSheet)
-			updateTimer()
 			onRepeatModeChanged(instance?.repeatMode ?: Player.REPEAT_MODE_OFF)
 			onShuffleModeEnabledChanged(instance?.shuffleModeEnabled ?: false)
 			onPlaybackStateChanged(instance?.playbackState ?: Player.STATE_IDLE)
@@ -474,15 +456,6 @@ class FullBottomSheet(context: Context, attrs: AttributeSet?, defStyleAttr: Int,
 		}
 	}
 
-	private fun updateTimer() {
-		val t = instance?.getTimer()
-		bottomSheetTimerButton.isChecked = t != null
-		TooltipCompat.setTooltipText(bottomSheetTimerButton,
-			if (t != null) context.getString(R.string.timer_expiry,
-				DateFormat.getTimeFormat(context).format(System.currentTimeMillis() + t)
-			) else context.getString(R.string.timer)
-		)
-	}
 
 	override fun onSharedPreferenceChanged(sharedPreferences: SharedPreferences?, key: String?) {
 		if (key == "color_accuracy" || key == "content_based_color") {
@@ -779,8 +752,6 @@ class FullBottomSheet(context: Context, attrs: AttributeSet?, defStyleAttr: Int,
 				colorPrimary
 			)
 
-			bottomSheetTimerButton.iconTint =
-				ColorStateList.valueOf(colorOnSurface)
 			bottomSheetPlaylistButton.iconTint =
 				ColorStateList.valueOf(colorOnSurface)
 			bottomSheetShuffleButton.iconTint =

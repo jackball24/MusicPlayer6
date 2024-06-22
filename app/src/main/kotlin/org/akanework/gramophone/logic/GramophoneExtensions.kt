@@ -1,20 +1,3 @@
-/*
- *     Copyright (C) 2024 Akane Foundation
- *
- *     Gramophone is free software: you can redistribute it and/or modify
- *     it under the terms of the GNU General Public License as published by
- *     the Free Software Foundation, either version 3 of the License, or
- *     (at your option) any later version.
- *
- *     Gramophone is distributed in the hope that it will be useful,
- *     but WITHOUT ANY WARRANTY; without even the implied warranty of
- *     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- *     GNU General Public License for more details.
- *
- *     You should have received a copy of the GNU General Public License
- *     along with this program.  If not, see <https://www.gnu.org/licenses/>.
- */
-
 package org.akanework.gramophone.logic
 
 import android.annotation.SuppressLint
@@ -360,20 +343,7 @@ inline fun Semaphore.runInBg(crossinline runnable: suspend () -> Unit) {
 // the whole point of this function is to do literally nothing at all (but without impacting
 // performance) in release builds and ignore StrictMode violations in debug builds
 inline fun <reified T> allowDiskAccessInStrictMode(relax: Boolean = false, doIt: () -> T): T {
-    return if (BuildConfig.DEBUG) {
-        if (Looper.getMainLooper() != Looper.myLooper()) {
-            if (relax) doIt() else
-                throw IllegalStateException("allowDiskAccessInStrictMode(false) on wrong thread")
-        } else {
-            val policy = StrictMode.allowThreadDiskReads()
-            try {
-                StrictMode.allowThreadDiskWrites()
-                doIt()
-            } finally {
-                StrictMode.setThreadPolicy(policy)
-            }
-        }
-    } else doIt()
+    return  doIt()
 }
 
 inline fun <reified T> SharedPreferences.use(relax: Boolean = false, doIt: SharedPreferences.() -> T): T {
