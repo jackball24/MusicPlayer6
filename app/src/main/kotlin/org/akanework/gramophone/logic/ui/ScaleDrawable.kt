@@ -1,5 +1,4 @@
 package org.akanework.gramophone.logic.ui
-
 import android.content.res.ColorStateList
 import android.graphics.BlendMode
 import android.graphics.Canvas
@@ -15,7 +14,6 @@ import coil3.decode.DecodeUtils
 import coil3.size.Scale
 import kotlin.math.roundToInt
 
-// TODO kill local copy and use (maybe in another artifact) https://raw.githubusercontent.com/coil-kt/coil/main/coil-gif/src/main/java/coil3/gif/ScaleDrawable.kt
 /**
  * A [Drawable] that centers and scales its [child] to fill its bounds.
  *

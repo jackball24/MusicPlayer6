@@ -5,7 +5,6 @@ import androidx.media3.common.ForwardingPlayer
 import androidx.media3.common.Player
 import androidx.media3.common.util.UnstableApi
 import androidx.media3.exoplayer.ExoPlayer
-import org.akanework.gramophone.BuildConfig
 import org.akanework.gramophone.logic.utils.CircularShuffleOrder
 
 
@@ -26,9 +25,7 @@ class EndedWorkaroundPlayer(player: ExoPlayer)
 		get() = wrappedPlayer as ExoPlayer
 	var isEnded = false
 		set(value) {
-			if (BuildConfig.DEBUG) {
-				Log.d(TAG, "isEnded set to $value (was $field)")
-			}
+
 			field = value
 			if (field) {
 				wrappedPlayer.addListener(this)

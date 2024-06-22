@@ -1,11 +1,3 @@
-/**
- * This file (CallbackViewInflater.kt) is dual-licensed (you can choose one):
- * - Project license (as of writing GPL-3.0-or-later)
- * - Apache-2.0
- * Because it's really only Android boilerplate hacks, and I hope this will be of use for someone.
- * Copyright (C) 2024 nift4
- */
-
 package org.akanework.gramophone.logic.ui
 
 import android.content.Context

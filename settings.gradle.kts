@@ -14,6 +14,6 @@ dependencyResolutionManagement {
     }
 }
 
-rootProject.name = "Gramophone"
+rootProject.name = "MusicPlayer6"
 include(":app")
 include(":baselineprofile")
