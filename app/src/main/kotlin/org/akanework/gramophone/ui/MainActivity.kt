@@ -241,7 +241,6 @@ class MainActivity : AppCompatActivity() {
 
     @OptIn(UnstableApi::class)
     override fun onDestroy() {
-        // https://github.com/androidx/media/issues/805
         if (needsMissingOnDestroyCallWorkarounds()
             && (getPlayer()?.playWhenReady != true || getPlayer()?.mediaItemCount == 0)) {
             val nm = getSystemService(NOTIFICATION_SERVICE) as NotificationManager

@@ -29,7 +29,6 @@ abstract class BaseFragment(val wantsPlayer: Boolean? = null) : Fragment() {
         reenterTransition = MaterialSharedAxis(MaterialSharedAxis.X, /* forward= */ false)
     }
 
-    // https://github.com/material-components/material-components-android/issues/1984#issuecomment-1089710991
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         // Overlap colors.
