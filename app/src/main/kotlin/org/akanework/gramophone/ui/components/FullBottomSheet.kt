@@ -73,6 +73,7 @@ import org.akanework.gramophone.logic.GramophonePlaybackService
 import org.akanework.gramophone.logic.clone
 import org.akanework.gramophone.logic.dpToPx
 import org.akanework.gramophone.logic.fadInAnimation
+import org.akanework.gramophone.logic.fadOutAnimation
 import org.akanework.gramophone.logic.getBooleanStrict
 import org.akanework.gramophone.logic.getFile
 import org.akanework.gramophone.logic.getIntStrict
@@ -449,7 +450,17 @@ class FullBottomSheet(context: Context, attrs: AttributeSet?, defStyleAttr: Int,
 
 		bottomSheetLyricButton.setOnClickListener {
 			ViewCompat.performHapticFeedback(it, HapticFeedbackConstantsCompat.CONTEXT_CLICK)
-			bottomSheetFullLyricRecyclerView.fadInAnimation(LYRIC_FADE_TRANSITION_SEC)
+			if(bottomSheetFullLyricRecyclerView.visibility == View.VISIBLE) {
+				bottomSheetFullLyricRecyclerView.fadOutAnimation(LYRIC_FADE_TRANSITION_SEC)
+				bottomSheetFullTitle.setTextAnimation(instance?.currentMediaItem?.mediaMetadata?.title, skipAnimation = true)
+				bottomSheetFullSubtitle.setTextAnimation(instance?.currentMediaItem?.mediaMetadata?.artist, skipAnimation = true )
+			} else {
+				bottomSheetFullLyricRecyclerView.visibility = View.VISIBLE
+				bottomSheetFullLyricRecyclerView.fadInAnimation(LYRIC_FADE_TRANSITION_SEC)
+				bottomSheetFullTitle.setTextAnimation(null)
+				bottomSheetFullSubtitle.setTextAnimation(null)
+			}
+
 		}
 
 		bottomSheetShuffleButton.setOnClickListener {
@@ -862,10 +873,15 @@ class FullBottomSheet(context: Context, attrs: AttributeSet?, defStyleAttr: Int,
 			} else {
 				load(mediaItem?.mediaMetadata?.artworkUri)
 			}
+
 			bottomSheetFullTitle.setTextAnimation(mediaItem?.mediaMetadata?.title, skipAnimation = firstTime)
 			bottomSheetFullSubtitle.setTextAnimation(
 				mediaItem?.mediaMetadata?.artist ?: context.getString(R.string.unknown_artist), skipAnimation = firstTime
 			)
+			if(bottomSheetFullLyricRecyclerView.visibility == View.VISIBLE) {
+				bottomSheetFullTitle.setTextAnimation(null)
+				bottomSheetFullSubtitle.setTextAnimation(null)
+			}
 			bottomSheetFullDuration.text =
 				mediaItem?.mediaMetadata?.extras?.getLong("Duration")
 					?.let { CalculationUtils.convertDurationToTimeStamp(it) }
@@ -878,16 +894,6 @@ class FullBottomSheet(context: Context, attrs: AttributeSet?, defStyleAttr: Int,
 				}
 			}
 
-			/*
-			if (activity.libraryViewModel.playlistList.value!![MediaStoreUtils.favPlaylistPosition]
-					.songList.contains(instance.currentMediaItem)
-			) {
-				// TODO
-			} else {
-				// TODO
-			}
-
-			 */
 		} else {
 			lastDisposable?.dispose()
 			lastDisposable = null
@@ -977,7 +983,7 @@ class FullBottomSheet(context: Context, attrs: AttributeSet?, defStyleAttr: Int,
 	}
 
 	override fun onKeyDown(keyCode: Int, event: KeyEvent?): Boolean {
-		//android.util.Log.e("hi","$keyCode") TODO this method is no-op, but why?
+
 		return when (keyCode) {
 			KeyEvent.KEYCODE_SPACE -> {
 				instance?.playOrPause(); true
@@ -1068,11 +1074,11 @@ class FullBottomSheet(context: Context, attrs: AttributeSet?, defStyleAttr: Int,
 					this.gravity = Gravity.START
 				}
 
-				val textSize = if (lyric.isTranslation) 20f else 28f
-				val paddingTop = (if (lyric.isTranslation) 2 else 18).dpToPx(context)
+				val textSize = if (lyric.isTranslation) 20f else 24f
+				val paddingTop = (if (lyric.isTranslation) 2 else 10).dpToPx(context)
 				val paddingBottom = (if (position + 1 < lyricList.size &&
 					lyricList[position + 1].isTranslation
-				) 2 else 18).dpToPx(context)
+				) 2 else 10).dpToPx(context)
 
 				this.textSize = textSize
 				setPadding(10.dpToPx(context), paddingTop, 10.dpToPx(context), paddingBottom)
