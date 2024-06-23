@@ -6,23 +6,28 @@ import org.akanework.gramophone.ui.adapters.BaseAdapter
 import org.akanework.gramophone.ui.adapters.PlaylistAdapter
 import org.akanework.gramophone.ui.adapters.SongAdapter
 
+const val ALBUM_ADAPTER_TYPE = 0
+const val ARTIST_ADAPTER_TYPE = 1
+const val PLAYLIST_ADAPTER_TYPE = 2
+const val SONG_ADAPTER_TYPE = 3
+
 fun getAdapterType(adapter: BaseAdapter<*>) =
 when (adapter) {
     is AlbumAdapter -> {
-        0
+        ALBUM_ADAPTER_TYPE
     }
 
     is ArtistAdapter -> {
-        1
+        ARTIST_ADAPTER_TYPE
     }
 
 
     is PlaylistAdapter -> {
-        2
+        PLAYLIST_ADAPTER_TYPE
     }
 
     is SongAdapter -> {
-        3
+        SONG_ADAPTER_TYPE
     }
 
     else -> {
