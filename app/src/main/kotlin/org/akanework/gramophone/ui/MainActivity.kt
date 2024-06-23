@@ -43,8 +43,6 @@ import org.akanework.gramophone.ui.fragments.BaseFragment
  * MainActivity:
  *   Core of gramophone, one and the only activity
  * used across the application.
- *
- * @author AkaneTan, nift4
  */
 class MainActivity : AppCompatActivity() {
 
