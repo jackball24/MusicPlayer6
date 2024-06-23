@@ -61,7 +61,7 @@
 		android:layout_marginTop="10dp"
 		android:layout_weight="1"
 		android:gravity="center_vertical"
-		app:layout_constraintBottom_toTopOf="@id/actionBar"
+		app:layout_constraintBottom_toTopOf="@id/sound"
 		app:layout_constraintEnd_toEndOf="parent"
 		app:layout_constraintHeight_min="200dp"
 		app:layout_constraintStart_toEndOf="@id/album_cover_frame">
@@ -250,6 +250,66 @@
 			app:layout_constraintTop_toTopOf="@id/sheet_mid_button" />
 	</androidx.constraintlayout.widget.ConstraintLayout>
 
+	<LinearLayout
+		android:id="@+id/sound"
+		android:layout_width="240dp"
+		android:layout_height="35dp"
+		android:layout_marginHorizontal="15dp"
+		app:layout_constraintBottom_toTopOf="@id/actionBar"
+		app:layout_constraintEnd_toEndOf="@id/controls"
+		app:layout_constraintStart_toStartOf="@id/controls"
+		app:layout_constraintTop_toBottomOf="@id/sheet_mid_button">
+
+		<androidx.appcompat.widget.AppCompatImageView
+			android:id="@+id/volume_down"
+			android:layout_width="0dp"
+			android:layout_height="25dp"
+			android:layout_gravity="center"
+			android:layout_weight="1"
+			android:background="@drawable/ic_volume_down"
+			app:srcCompat="@drawable/ic_volume_down"
+			app:tint="?attr/colorControlNormal" />
+		<FrameLayout
+			android:layout_height="match_parent"
+			android:layout_width="190dp">
+			<SeekBar
+				android:id="@+id/volume"
+				style="@style/MediaPlayer.ProgressBar"
+				android:layout_width="match_parent"
+				android:layout_height="10dp"
+				android:layout_gravity="center"
+				android:progress="0"
+				android:thumbTint="?attr/colorPrimary"
+				app:labelBehavior="gone"
+				tools:progress="20"
+				tools:visibility="visible" />
+
+			<com.google.android.material.slider.Slider
+				android:id="@+id/volume_slider"
+				android:layout_width="match_parent"
+				android:layout_height="wrap_content"
+				android:layout_gravity="center"
+				android:value="0"
+				android:visibility="gone"
+				app:labelBehavior="gone"
+				app:thumbHeight="0dp"
+				app:thumbTrackGapSize="2dp"
+				app:thumbWidth="0dp"
+				app:trackHeight="6dp"
+				tools:value="0.5"
+				tools:visibility="visible" />
+		</FrameLayout>
+		<androidx.appcompat.widget.AppCompatImageView
+			android:id="@+id/volume_up"
+			android:layout_width="0dp"
+			android:layout_height="25dp"
+			android:layout_gravity="center"
+			android:layout_weight="1"
+			android:background="@drawable/ic_volume_up"
+			android:padding="12dp"
+			app:srcCompat="@drawable/ic_volume_up"
+			app:tint="?attr/colorControlNormal" />
+	</LinearLayout>
 	<LinearLayout
 		android:id="@+id/actionBar"
 		android:layout_width="0dp"
