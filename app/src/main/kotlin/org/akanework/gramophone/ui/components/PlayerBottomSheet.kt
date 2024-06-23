@@ -98,6 +98,7 @@ class PlayerBottomSheet private constructor(
         get() = standardBottomSheetBehavior?.state != BottomSheetBehavior.STATE_HIDDEN
 
     init {
+        // 布局的初始化
         inflate(context, R.layout.bottom_sheet, this)
         previewPlayer = findViewById(R.id.preview_player)
         fullPlayer = findViewById(R.id.full_player)
@@ -106,23 +107,24 @@ class PlayerBottomSheet private constructor(
         bottomSheetPreviewCover = findViewById(R.id.preview_album_cover)
         bottomSheetPreviewControllerButton = findViewById(R.id.preview_control)
         bottomSheetPreviewNextButton = findViewById(R.id.preview_next)
-
+        // 设置点击事件监听器
         setOnClickListener {
             if (standardBottomSheetBehavior!!.state == BottomSheetBehavior.STATE_COLLAPSED) {
                 standardBottomSheetBehavior!!.state = BottomSheetBehavior.STATE_EXPANDED
             }
         }
 
+        // 设置播放控制按钮的点击事件
         bottomSheetPreviewControllerButton.setOnClickListener {
             ViewCompat.performHapticFeedback(it, HapticFeedbackConstantsCompat.CONTEXT_CLICK)
             instance?.playOrPause()
         }
-
+        // 设置下一首按钮的点击事件
         bottomSheetPreviewNextButton.setOnClickListener {
             ViewCompat.performHapticFeedback(it, HapticFeedbackConstantsCompat.CONTEXT_CLICK)
             instance?.seekToNextMediaItem()
         }
-
+        // 添加控制器的回调
         activity.controllerViewModel.addControllerCallback(activity.lifecycle) { _, _ ->
             instance?.addListener(this@PlayerBottomSheet)
             onPlaybackStateChanged(instance?.playbackState ?: Player.STATE_IDLE)
@@ -199,6 +201,7 @@ class PlayerBottomSheet private constructor(
             standardBottomSheetBehavior = MyBottomSheetBehavior.from(this)
             fullPlayer.minimize = {
                 standardBottomSheetBehavior!!.state = BottomSheetBehavior.STATE_COLLAPSED }
+            // 设置返回按钮事件回调
             bottomSheetBackCallback = object : OnBackPressedCallback(enabled = false) {
                 override fun handleOnBackStarted(backEvent: BackEventCompat) {
                     if (fullPlayer.bottomSheetFullLyricRecyclerView.visibility ==
@@ -307,8 +310,7 @@ class PlayerBottomSheet private constructor(
 
         lastMeasuredHeight = previewPlayer.measuredHeight
         lastActuallyVisible = actuallyVisible
-        // This dispatches the last known insets again to force regeneration of
-        // FragmentContainerView's insets which will in turn call generateBottomSheetInsets().
+
         val i = ViewCompat.getRootWindowInsets(activity.window.decorView)
         if (i != null) {
             ViewCompat.dispatchApplyWindowInsets(activity.window.decorView, i.clone())
@@ -316,16 +318,13 @@ class PlayerBottomSheet private constructor(
     }
 
     override fun dispatchApplyWindowInsets(platformInsets: WindowInsets): WindowInsets {
+        // 处理窗口插入事件
+        // 设置底部播放器的 padding 和底部表单的高度
+        // 更新底部表单的高度等
         val insets = WindowInsetsCompat.toWindowInsetsCompat(platformInsets)
         val myInsets = insets.getInsets(WindowInsetsCompat.Type.systemBars()
                 or WindowInsetsCompat.Type.displayCutout())
-        // We here have to set up inset padding manually as the bottom sheet won't know what
-        // View is behind the status bar, paddingTopSystemWindowInsets just allows it to go
-        // behind it, which differs from the other padding*SystemWindowInsets. We can't use the
-        // other padding*SystemWindowInsets to apply systemBars() because previewPlayer and
-        // fullPlayer should extend into system bars AND display cutout. previewPlayer can't use
-        // fitsSystemWindows because it doesn't want top padding from status bar.
-        // We have to do it manually, duh.
+
         previewPlayer.setPadding(myInsets.left, 0, myInsets.right, myInsets.bottom)
         // Let fullPlayer handle insets itself (and discard result as it's irrelevant to hierarchy)
         ViewCompat.dispatchApplyWindowInsets(fullPlayer, insets.clone())
@@ -353,7 +352,8 @@ class PlayerBottomSheet private constructor(
     override fun onMediaItemTransition(
         mediaItem: MediaItem?,
         reason: Int,
-    ) {
+    ) {// 处理媒体项的切换和相应的状态变化
+        // 更新底部表单的显示状态和内容
         if ((instance?.mediaItemCount ?: 0) > 0) {
             lastDisposable?.dispose()
             lastDisposable = context.imageLoader.enqueue(ImageRequest.Builder(context).apply {
@@ -382,17 +382,18 @@ class PlayerBottomSheet private constructor(
             newState = BottomSheetBehavior.STATE_HIDDEN
         }
         handler.post {
-            // if we are destroyed after onMediaItemTransition but before this runs,
-            // standardBottomSheetBehavior will be null
+
             standardBottomSheetBehavior?.state = newState
         }
     }
 
     override fun onIsPlayingChanged(isPlaying: Boolean) {
+        // 处理播放状态的变化，更新播放控制按钮的图标和状态
         onPlaybackStateChanged(instance?.playbackState ?: Player.STATE_IDLE)
     }
 
     override fun onPlaybackStateChanged(playbackState: Int) {
+        // 处理播放状态的变化，更新播放控制按钮的状态
         if (playbackState == Player.STATE_BUFFERING) return
         val myTag = bottomSheetPreviewControllerButton.getTag(R.id.play_next) as Int?
         if (instance?.isPlaying == true && myTag != 1) {

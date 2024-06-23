@@ -147,6 +147,7 @@ class SongAdapter(
         return "null"
     }
 
+    //点击歌曲播放
     override fun onClick(item: MediaItem) {
         val mediaController = mainActivity.getPlayer()
         mediaController?.apply {

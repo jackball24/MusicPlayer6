@@ -122,7 +122,6 @@ object MediaStoreUtils {
         val content: String = "",
         var isTranslation: Boolean = false
     ) : Parcelable
-
     class RecentlyAdded(minAddDate: Long, songList: PriorityQueue<Pair<Long, MediaItem>>) : Playlist(
         -1, null, mutableListOf()
     ) {
@@ -185,6 +184,7 @@ object MediaStoreUtils {
         }
     }
 
+//给定的文件路径 path 添加到文件系统的目录结构中，并返回最后一个节点
     private fun handleMediaFolder(path: String, rootNode: FileNode): FileNode {
         val newPath = if (path.endsWith('/')) path.substring(1, path.length - 1)
         else path.substring(1)
@@ -230,6 +230,8 @@ object MediaStoreUtils {
      * @param context
      * @return
      */
+
+    //本地存储中获取所有音乐文件的元数据，并组织成 LibraryStoreClass 对象返回。
     private fun getAllSongs(context: Context): LibraryStoreClass {
         val selection = "${MediaStore.Audio.Media.IS_MUSIC} != 0" +
                 listOf(
@@ -317,11 +319,14 @@ object MediaStoreUtils {
             }
             map
         } else null
+
+        //从设备上的媒体库中获取音乐播放列表的信息
         context.contentResolver.query(@Suppress("DEPRECATION")
-            MediaStore.Audio.Playlists.EXTERNAL_CONTENT_URI, arrayOf(
-                @Suppress("DEPRECATION") MediaStore.Audio.Playlists._ID,
-                @Suppress("DEPRECATION") MediaStore.Audio.Playlists.NAME
-            ), null, null, null)?.use {
+        MediaStore.Audio.Playlists.EXTERNAL_CONTENT_URI, arrayOf(
+            @Suppress("DEPRECATION") MediaStore.Audio.Playlists._ID,
+            @Suppress("DEPRECATION") MediaStore.Audio.Playlists.NAME
+        ), null, null, null)?.use {
+            // 处理查询结果
             val playlistIdColumn = it.getColumnIndexOrThrow(
                 @Suppress("DEPRECATION") MediaStore.Audio.Playlists._ID
             )
@@ -356,6 +361,8 @@ object MediaStoreUtils {
                 playlists.add(Pair(playlist, content))
             }
         }
+
+        //从设备的媒体库中获取音频文件的信息，并将这些信息转换为 MediaItem 对象
         val idMap = if (foundPlaylistContent) hashMapOf<Long, MediaItem>() else null
         val cursor = context.contentResolver.query(
             MediaStore.Audio.Media.EXTERNAL_CONTENT_URI,
@@ -413,6 +420,7 @@ object MediaStoreUtils {
                 val skip = (duration != null && duration < limitValue * 1000) || folderFilter.contains(fldPath)
                 // We need to add blacklisted songs to idMap as they can be referenced by playlist
                 if (skip && !foundPlaylistContent) continue
+                // 从结果集中获取音频文件的各种属性
                 val id = it.getLongOrNull(idColumn)!!
                 val title = it.getStringOrNull(titleColumn)!!
                 val artist = it.getStringOrNull(artistColumn)
@@ -450,7 +458,7 @@ object MediaStoreUtils {
                     dateTakenParsed?.dayOfMonth
                 } else null
 
-                // Since we're using glide, we can get album cover with a uri.
+                // 使用Glide加载专辑封面图片
                 val imgUri = ContentUris.appendId(
                     MediaStore.Audio.Media.EXTERNAL_CONTENT_URI.buildUpon(), id)
                     .appendPath("albumart").build()
@@ -462,7 +470,8 @@ object MediaStoreUtils {
                     trackNumber %= 1000
                 }
 
-                // Build our mediaItem.
+
+                // 构建mediaItem.
                 val song = MediaItem
                     .Builder()
                     .setUri(pathFile.toUri())
@@ -513,7 +522,9 @@ object MediaStoreUtils {
                             })
                             .build(),
                     ).build()
-                // Build our metadata maps/lists.
+
+
+                //处理获取的数据并存储在相应的数据结构中
                 idMap?.put(id, song)
                 // Now that the song can be found by playlists, do NOT register other metadata.
                 if (skip) continue
@@ -552,7 +563,8 @@ object MediaStoreUtils {
             }
         }
 
-        // Parse all the lists.
+
+        // 解析和处理 albumMap 中的专辑信息
         val allowedCoverExtensions = listOf("jpg", "png", "jpeg", "bmp", "tiff", "tif", "webp")
         val albumList = albumMap.values.onEach {
             if (it.artistId == null) {
@@ -591,19 +603,24 @@ object MediaStoreUtils {
                         Log.e(TAG, Log.getStackTraceString(e))
                     }
                     // allow .jpg or .png files with any name, but only permit more exotic
-                    // formats if name contains either cover or albumart
+                    // 如果找到合适的封面文件，则将其设置为专辑的封面 URI
                     if (bestScore >= 3) {
                         bestFile?.let { f -> it.cover = f.toUri() }
                     }
                 }
             }
         }.toMutableList<Album>()
+
+
+        //从map中获取数据，转换为列表
         val artistList = artistMap.values.toMutableList()
         val albumArtistList = albumArtistMap.entries.map { (artist, albumsAndSongs) ->
             Artist(artistCacheMap[artist], artist, albumsAndSongs.second, albumsAndSongs.first)
         }.toMutableList()
         val genreList = genreMap.values.toMutableList()
         val dateList = dateMap.values.toMutableList()
+
+
         val playlistsFinal = playlists.map {
             it.first.also { playlist ->
                 playlist.songList.addAll(it.second.map { value -> idMap!![value]
@@ -614,6 +631,8 @@ object MediaStoreUtils {
                             "song for id $value in map with ${idMap.size} entries") })
             }
         }.toMutableList()
+
+        // 创建默认收藏夹
         if (!foundFavourites) {
             val values = ContentValues()
             values.put(
@@ -645,12 +664,15 @@ object MediaStoreUtils {
                 )
             }
         }
+        //添加最近添加的歌曲列表
         playlistsFinal.add(RecentlyAdded(
             // TODO setting?
             (System.currentTimeMillis() / 1000) - (2 * 7 * 24 * 60 * 60),
             recentlyAddedMap
         ))
+        //更新文件夹信息
         folders.addAll(folderFilter)
+
         return LibraryStoreClass(
             songs,
             albumList,
@@ -682,6 +704,7 @@ object MediaStoreUtils {
         }
     }
 
+    //创建一个虚拟的 MediaItem 对象,代表在实际数据中找不到的歌曲
     private fun dummyMediaItem(id: Long, title: String): MediaItem {
         return MediaItem.Builder()
             .setMediaId(id.toString())

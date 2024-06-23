@@ -12,7 +12,6 @@ import android.graphics.Bitmap
 import android.graphics.drawable.BitmapDrawable
 import android.graphics.drawable.TransitionDrawable
 import android.media.AudioManager
-import android.text.format.DateFormat
 import android.util.AttributeSet
 import android.util.Size
 import android.view.Gravity
@@ -25,7 +24,6 @@ import android.widget.ImageView
 import android.widget.SeekBar
 import android.widget.TextView
 import androidx.appcompat.content.res.AppCompatResources
-import androidx.appcompat.widget.TooltipCompat
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.graphics.Insets
 import androidx.core.graphics.TypefaceCompat
@@ -59,8 +57,6 @@ import com.google.android.material.color.DynamicColors
 import com.google.android.material.color.DynamicColorsOptions
 import com.google.android.material.color.MaterialColors
 import com.google.android.material.slider.Slider
-import com.google.android.material.timepicker.MaterialTimePicker
-import com.google.android.material.timepicker.TimeFormat
 import com.google.common.util.concurrent.Futures
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -78,13 +74,11 @@ import org.akanework.gramophone.logic.getBooleanStrict
 import org.akanework.gramophone.logic.getFile
 import org.akanework.gramophone.logic.getIntStrict
 import org.akanework.gramophone.logic.getLyrics
-import org.akanework.gramophone.logic.getTimer
 import org.akanework.gramophone.logic.hasImagePermission
 import org.akanework.gramophone.logic.hasScopedStorageV1
 import org.akanework.gramophone.logic.hasScopedStorageWithMediaTypes
 import org.akanework.gramophone.logic.playOrPause
 import org.akanework.gramophone.logic.setTextAnimation
-import org.akanework.gramophone.logic.setTimer
 import org.akanework.gramophone.logic.startAnimation
 import org.akanework.gramophone.logic.ui.MyRecyclerView
 import org.akanework.gramophone.logic.ui.placeholderScaleToFit
@@ -107,9 +101,13 @@ class FullBottomSheet(context: Context, attrs: AttributeSet?, defStyleAttr: Int,
 
 	private val activity
 		get() = context as MainActivity
+
+
 	private val instance: MediaController?
 		get() = activity.getPlayer()
 	var minimize: (() -> Unit)? = null
+
+
 
 	private var wrappedContext: Context? = null
 	private var currentJob: Job? = null
@@ -199,8 +197,10 @@ class FullBottomSheet(context: Context, attrs: AttributeSet?, defStyleAttr: Int,
 	val bottomSheetFullTitle: TextView
 	val bottomSheetFullSubtitle: TextView
 	private val bottomSheetFullControllerButton: MaterialButton
+
 	private val bottomSheetFullNextButton: MaterialButton
 	private val bottomSheetFullPreviousButton: MaterialButton
+
 	private val bottomSheetFullDuration: TextView
 	private val bottomSheetFullPosition: TextView
 	private val bottomSheetFullSlideUpButton: MaterialButton
@@ -233,9 +233,11 @@ class FullBottomSheet(context: Context, attrs: AttributeSet?, defStyleAttr: Int,
 		bottomSheetFullCover = findViewById(R.id.full_sheet_cover)
 		bottomSheetFullTitle = findViewById(R.id.full_song_name)
 		bottomSheetFullSubtitle = findViewById(R.id.full_song_artist)
+
 		bottomSheetFullPreviousButton = findViewById(R.id.sheet_previous_song)
 		bottomSheetFullControllerButton = findViewById(R.id.sheet_mid_button)
 		bottomSheetFullNextButton = findViewById(R.id.sheet_next_song)
+
 		bottomSheetFullPosition = findViewById(R.id.position)
 		bottomSheetFullDuration = findViewById(R.id.duration)
 		bottomSheetFullSeekBar = findViewById(R.id.slider_squiggly)
@@ -418,6 +420,8 @@ class FullBottomSheet(context: Context, attrs: AttributeSet?, defStyleAttr: Int,
 			ViewCompat.performHapticFeedback(it, HapticFeedbackConstantsCompat.CONTEXT_CLICK)
 			instance?.playOrPause()
 		}
+
+
 		bottomSheetFullPreviousButton.setOnClickListener {
 			ViewCompat.performHapticFeedback(it, HapticFeedbackConstantsCompat.CONTEXT_CLICK)
 			instance?.seekToPreviousMediaItem()
@@ -426,6 +430,8 @@ class FullBottomSheet(context: Context, attrs: AttributeSet?, defStyleAttr: Int,
 			ViewCompat.performHapticFeedback(it, HapticFeedbackConstantsCompat.CONTEXT_CLICK)
 			instance?.seekToNextMediaItem()
 		}
+
+
 		bottomSheetShuffleButton.addOnCheckedChangeListener { _, isChecked ->
 			instance?.shuffleModeEnabled = isChecked
 		}
@@ -804,6 +810,8 @@ class FullBottomSheet(context: Context, attrs: AttributeSet?, defStyleAttr: Int,
 				ColorStateList.valueOf(colorOnSurface)
 			bottomSheetFullPreviousButton.iconTint =
 				ColorStateList.valueOf(colorOnSurface)
+
+
 			bottomSheetFullSlideUpButton.iconTint =
 				ColorStateList.valueOf(colorOnSurface)
 
