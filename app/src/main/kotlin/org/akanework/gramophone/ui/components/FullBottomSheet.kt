@@ -100,17 +100,22 @@ import kotlin.math.min
 class FullBottomSheet(context: Context, attrs: AttributeSet?, defStyleAttr: Int, defStyleRes: Int) :
 	ConstraintLayout(context, attrs, defStyleAttr, defStyleRes), Player.Listener,
 	SharedPreferences.OnSharedPreferenceChangeListener {
+	// 构造方法
 	constructor(context: Context, attrs: AttributeSet?, defStyleAttr: Int) :
-		this(context, attrs, defStyleAttr, 0)
+			this(context, attrs, defStyleAttr, 0)
 	constructor(context: Context, attrs: AttributeSet?) : this(context, attrs, 0)
 	constructor(context: Context) : this(context, null)
 
+	// 获取活动实例
 	private val activity
 		get() = context as MainActivity
+	// 获取媒体控制器实例
 	private val instance: MediaController?
 		get() = activity.getPlayer()
+	// 定义最小化功能的回调
 	var minimize: (() -> Unit)? = null
 
+	// 声明各种变量
 	private var wrappedContext: Context? = null
 	private var currentJob: Job? = null
 	private var isUserTracking = false
@@ -132,6 +137,7 @@ class FullBottomSheet(context: Context, attrs: AttributeSet?, defStyleAttr: Int,
 		const val LYRIC_FADE_TRANSITION_SEC: Long = 125
 	}
 
+	// 进度条触摸监听器
 	private val touchListener = object : SeekBar.OnSeekBarChangeListener, Slider.OnSliderTouchListener {
 		override fun onProgressChanged(seekBar: SeekBar?, progress: Int, fromUser: Boolean) {
 			if (fromUser) {
@@ -173,6 +179,8 @@ class FullBottomSheet(context: Context, attrs: AttributeSet?, defStyleAttr: Int,
 			isUserTracking = false
 		}
 	}
+
+	// 音量控制的SeekBar监听器
 	private val volumeSeekBarChangeListener = object : SeekBar.OnSeekBarChangeListener {
 		override fun onProgressChanged(seekBar: SeekBar?, progress: Int, fromUser: Boolean) {
 			if (fromUser) {
@@ -185,7 +193,7 @@ class FullBottomSheet(context: Context, attrs: AttributeSet?, defStyleAttr: Int,
 		override fun onStopTrackingTouch(seekBar: SeekBar?) {}
 	}
 
-	// 定义BroadcastReceiver来监听音量变化
+	// BroadcastReceiver来监听音量变化
 	private val volumeReceiver = object : BroadcastReceiver() {
 		override fun onReceive(context: Context?, intent: Intent?) {
 			if (intent?.action == "android.media.VOLUME_CHANGED_ACTION") {
@@ -195,6 +203,7 @@ class FullBottomSheet(context: Context, attrs: AttributeSet?, defStyleAttr: Int,
 		}
 	}
 
+	// 声明控件
 	private val bottomSheetFullCover: ImageView
 	val bottomSheetFullTitle: TextView
 	val bottomSheetFullSubtitle: TextView
@@ -210,12 +219,14 @@ class FullBottomSheet(context: Context, attrs: AttributeSet?, defStyleAttr: Int,
 	private val bottomSheetFavoriteButton: MaterialButton
 	val bottomSheetLyricButton: MaterialButton
 	private val bottomSheetFullSeekBar: SeekBar
-	private val bottomSheetVolumeSeekBar:SeekBar
+	private val bottomSheetVolumeSeekBar: SeekBar
 	private val bottomSheetFullSlider: Slider
 	private val bottomSheetFullCoverFrame: MaterialCardView
 	val bottomSheetFullLyricRecyclerView: RecyclerView
 	private val bottomSheetFullLyricList: MutableList<MediaStoreUtils.Lyric> = mutableListOf()
-	private val bottomSheetFullLyricAdapter: LyricAdapter = LyricAdapter(bottomSheetFullLyricList)
+	private val bottomSheetFullLyricAdapter
+
+			: LyricAdapter = LyricAdapter(bottomSheetFullLyricList)
 	private val bottomSheetFullLyricLinearLayoutManager = LinearLayoutManager(context)
 	private val progressDrawable: SquigglyProgress
 	private var fullPlayerFinalColor: Int = -1
@@ -227,6 +238,7 @@ class FullBottomSheet(context: Context, attrs: AttributeSet?, defStyleAttr: Int,
 	private var playlistNowPlayingCover: ImageView? = null
 	private var lastDisposable: Disposable? = null
 
+	// 初始化方法
 	init {
 		inflate(context, R.layout.full_player, this)
 		bottomSheetFullCoverFrame = findViewById(R.id.album_cover_frame)
@@ -257,6 +269,7 @@ class FullBottomSheet(context: Context, attrs: AttributeSet?, defStyleAttr: Int,
 		val filter = IntentFilter("android.media.VOLUME_CHANGED_ACTION")
 		context.registerReceiver(volumeReceiver, filter)
 
+		// 获取颜色
 		fullPlayerFinalColor = MaterialColors.getColor(
 			this,
 			com.google.android.material.R.attr.colorSurface
@@ -273,6 +286,8 @@ class FullBottomSheet(context: Context, attrs: AttributeSet?, defStyleAttr: Int,
 			this,
 			com.google.android.material.R.attr.colorSecondaryContainer
 		)
+
+		// 处理WindowInsets
 		ViewCompat.setOnApplyWindowInsetsListener(bottomSheetFullLyricRecyclerView) { v, insets ->
 			val myInsets = insets.getInsets(WindowInsetsCompat.Type.systemBars()
 					or WindowInsetsCompat.Type.displayCutout())
@@ -295,7 +310,7 @@ class FullBottomSheet(context: Context, attrs: AttributeSet?, defStyleAttr: Int,
 		activity.controllerViewModel.customCommandListeners.addCallback(activity.lifecycle) { _, command, _ ->
 			when (command.customAction) {
 
-
+				// 获取歌词命令
 				GramophonePlaybackService.SERVICE_GET_LYRICS -> {
 					val parsedLyrics = instance?.getLyrics()
 					if (bottomSheetFullLyricList != parsedLyrics) {
@@ -322,6 +337,7 @@ class FullBottomSheet(context: Context, attrs: AttributeSet?, defStyleAttr: Int,
 			return@addCallback Futures.immediateFuture(SessionResult(SessionResult.RESULT_SUCCESS))
 		}
 
+		// 进度条相关参数
 		val seekBarProgressWavelength =
 			context.resources
 				.getDimensionPixelSize(R.dimen.media_seekbar_progress_wavelength)
@@ -355,8 +371,7 @@ class FullBottomSheet(context: Context, attrs: AttributeSet?, defStyleAttr: Int,
 			)
 		}
 
-
-
+		// 循环按钮点击事件
 		bottomSheetLoopButton.setOnClickListener {
 			ViewCompat.performHapticFeedback(it, HapticFeedbackConstantsCompat.CONTEXT_CLICK)
 			instance?.repeatMode = when (instance?.repeatMode) {
@@ -367,8 +382,7 @@ class FullBottomSheet(context: Context, attrs: AttributeSet?, defStyleAttr: Int,
 			}
 		}
 
-
-
+		// 播放列表按钮点击事件
 		bottomSheetPlaylistButton.setOnClickListener {
 			ViewCompat.performHapticFeedback(it, HapticFeedbackConstantsCompat.CONTEXT_CLICK)
 			val playlistBottomSheet = BottomSheetDialog(context)
@@ -413,23 +427,34 @@ class FullBottomSheet(context: Context, attrs: AttributeSet?, defStyleAttr: Int,
 				}
 			}
 			playlistBottomSheet.show()
+
+
 		}
+
+		// 播放按钮点击事件
 		bottomSheetFullControllerButton.setOnClickListener {
 			ViewCompat.performHapticFeedback(it, HapticFeedbackConstantsCompat.CONTEXT_CLICK)
 			instance?.playOrPause()
 		}
+
+		// 上一曲按钮点击事件
 		bottomSheetFullPreviousButton.setOnClickListener {
 			ViewCompat.performHapticFeedback(it, HapticFeedbackConstantsCompat.CONTEXT_CLICK)
 			instance?.seekToPreviousMediaItem()
 		}
+
+		// 下一曲按钮点击事件
 		bottomSheetFullNextButton.setOnClickListener {
 			ViewCompat.performHapticFeedback(it, HapticFeedbackConstantsCompat.CONTEXT_CLICK)
 			instance?.seekToNextMediaItem()
 		}
+
+		// 随机播放按钮监听事件
 		bottomSheetShuffleButton.addOnCheckedChangeListener { _, isChecked ->
 			instance?.shuffleModeEnabled = isChecked
 		}
 
+		// 进度条变化监听事件
 		bottomSheetFullSlider.addOnChangeListener { _, value, isUser ->
 			if (isUser) {
 				val dest = instance?.currentMediaItem?.mediaMetadata?.extras?.getLong("Duration")
@@ -440,14 +465,17 @@ class FullBottomSheet(context: Context, attrs: AttributeSet?, defStyleAttr: Int,
 			}
 		}
 
+		// 进度条触摸监听事件
 		bottomSheetFullSeekBar.setOnSeekBarChangeListener(touchListener)
 		bottomSheetFullSlider.addOnSliderTouchListener(touchListener)
 
+		// 向上滑动按钮点击事件
 		bottomSheetFullSlideUpButton.setOnClickListener {
 			ViewCompat.performHapticFeedback(it, HapticFeedbackConstantsCompat.CONTEXT_CLICK)
 			minimize?.invoke()
 		}
 
+		// 歌词按钮点击事件
 		bottomSheetLyricButton.setOnClickListener {
 			ViewCompat.performHapticFeedback(it, HapticFeedbackConstantsCompat.CONTEXT_CLICK)
 			if(bottomSheetFullLyricRecyclerView.visibility == View.VISIBLE) {
@@ -461,20 +489,23 @@ class FullBottomSheet(context: Context, attrs: AttributeSet?, defStyleAttr: Int,
 				bottomSheetFullTitle.setTextAnimation(null)
 				bottomSheetFullSubtitle.setTextAnimation(null)
 			}
-
 		}
 
+		// 随机播放按钮点击事件
 		bottomSheetShuffleButton.setOnClickListener {
 			ViewCompat.performHapticFeedback(it, HapticFeedbackConstantsCompat.CONTEXT_CLICK)
 		}
 
+		// 设置歌词列表布局管理器和适配器
 		bottomSheetFullLyricRecyclerView.layoutManager =
 			bottomSheetFullLyricLinearLayoutManager
 		bottomSheetFullLyricRecyclerView.adapter =
 			bottomSheetFullLyricAdapter
 
+		// 移除颜色方案
 		removeColorScheme()
 
+		// 添加控制器回调
 		activity.controllerViewModel.addControllerCallback(activity.lifecycle) { _, _ ->
 			firstTime = true
 			instance?.addListener(this@FullBottomSheet)
@@ -486,7 +517,6 @@ class FullBottomSheet(context: Context, attrs: AttributeSet?, defStyleAttr: Int,
 				Player.MEDIA_ITEM_TRANSITION_REASON_PLAYLIST_CHANGED
 			)
 			firstTime = false
-
 		}
 	}
 
@@ -495,6 +525,8 @@ class FullBottomSheet(context: Context, attrs: AttributeSet?, defStyleAttr: Int,
 		super.onDetachedFromWindow()
 		context.unregisterReceiver(volumeReceiver)
 	}
+
+	// 监听SharedPreferences变化
 	override fun onSharedPreferenceChanged(sharedPreferences: SharedPreferences?, key: String?) {
 		if (key == "color_accuracy" || key == "content_based_color") {
 			if (DynamicColors.isDynamicColorAvailable() &&
@@ -512,16 +544,20 @@ class FullBottomSheet(context: Context, attrs: AttributeSet?, defStyleAttr: Int,
 		}
 	}
 
+	// 刷新设置
 	private fun refreshSettings(key: String?) {
+		// 显示进度条
 //		if (key == null || key == "default_progress_bar") {
 //			if (prefs.getBooleanStrict("default_progress_bar", true)) {
 //				bottomSheetFullSlider.visibility = View.GONE
 //				bottomSheetFullSeekBar.visibility = View.VISIBLE
 //			} else {
-				bottomSheetFullSlider.visibility = View.VISIBLE
-				bottomSheetFullSeekBar.visibility = View.GONE
+		bottomSheetFullSlider.visibility = View.VISIBLE
+		bottomSheetFullSeekBar.visibility = View.GONE
 //			}
 //		}
+
+		// 设置标题居中
 		if (key == null || key == "centered_title") {
 			if (prefs.getBooleanStrict("centered_title", true)) {
 				bottomSheetFullTitle.gravity = Gravity.CENTER
@@ -531,6 +567,8 @@ class FullBottomSheet(context: Context, attrs: AttributeSet?, defStyleAttr: Int,
 				bottomSheetFullSubtitle.gravity = Gravity.CENTER_HORIZONTAL or Gravity.START
 			}
 		}
+
+		// 设置标题加粗
 		if (key == null || key == "bold_title") {
 			if (prefs.getBooleanStrict("bold_title", true)) {
 				bottomSheetFullTitle.typeface = TypefaceCompat.create(context, null, 700, false)
@@ -538,21 +576,27 @@ class FullBottomSheet(context: Context, attrs: AttributeSet?, defStyleAttr: Int,
 				bottomSheetFullTitle.typeface = TypefaceCompat.create(context, null, 500, false)
 			}
 		}
+
+		// 设置专辑封面圆角
 		if (key == null || key == "album_round_corner") {
 			bottomSheetFullCoverFrame.radius = prefs.getIntStrict(
 				"album_round_corner",
 				context.resources.getInteger(R.integer.round_corner_radius)
 			).dpToPx(context).toFloat()
 		}
+
+		// 设置歌词状态
 		if (key == null || key == "lyric_center" || key == "lyric_bold" || key == "lyric_contrast") {
 			bottomSheetFullLyricAdapter.updateLyricStatus()
 		}
 	}
 
+	// 停止播放
 	fun onStop() {
 		runnableRunning = false
 	}
 
+	// 分发WindowInsets
 	override fun dispatchApplyWindowInsets(platformInsets: WindowInsets): WindowInsets {
 		val insets = WindowInsetsCompat.toWindowInsetsCompat(platformInsets)
 		val myInsets = insets.getInsets(WindowInsetsCompat.Type.systemBars()
@@ -568,6 +612,7 @@ class FullBottomSheet(context: Context, attrs: AttributeSet?, defStyleAttr: Int,
 			.toWindowInsets()!!
 	}
 
+	// 移除颜色方案
 	private fun removeColorScheme() {
 		currentJob?.cancel()
 		wrappedContext = null
@@ -576,6 +621,7 @@ class FullBottomSheet(context: Context, attrs: AttributeSet?, defStyleAttr: Int,
 		}
 	}
 
+	// 添加颜色方案
 	private fun addColorScheme() {
 		currentJob?.cancel()
 		currentJob = CoroutineScope(Dispatchers.Default).launch {
@@ -606,6 +652,7 @@ class FullBottomSheet(context: Context, attrs: AttributeSet?, defStyleAttr: Int,
 		}
 	}
 
+	// 应用颜色方案
 	private suspend fun applyColorScheme() {
 		val ctx = wrappedContext ?: context
 
@@ -617,7 +664,9 @@ class FullBottomSheet(context: Context, attrs: AttributeSet?, defStyleAttr: Int,
 
 		val colorOnSurface = MaterialColors.getColor(
 			ctx,
-			com.google.android.material.R.attr.colorOnSurface,
+			com.google.android.material
+
+				.R.attr.colorOnSurface,
 			-1
 		)
 
@@ -912,10 +961,12 @@ class FullBottomSheet(context: Context, attrs: AttributeSet?, defStyleAttr: Int,
 		updateLyric(duration)
 	}
 
+	// 监听随机播放模式改变
 	override fun onShuffleModeEnabledChanged(shuffleModeEnabled: Boolean) {
 		bottomSheetShuffleButton.isChecked = shuffleModeEnabled
 	}
 
+	// 监听循环模式改变
 	override fun onRepeatModeChanged(repeatMode: Int) {
 		when (repeatMode) {
 			Player.REPEAT_MODE_ALL -> {
@@ -938,10 +989,12 @@ class FullBottomSheet(context: Context, attrs: AttributeSet?, defStyleAttr: Int,
 		}
 	}
 
+	// 监听播放状态改变
 	override fun onIsPlayingChanged(isPlaying: Boolean) {
 		onPlaybackStateChanged(instance?.playbackState ?: Player.STATE_IDLE)
 	}
 
+	// 处理播放状态改变
 	override fun onPlaybackStateChanged(playbackState: Int) {
 		if (instance?.isPlaying == true) {
 			if (bottomSheetFullControllerButton.getTag(R.id.play_next) as Int? != 1) {
@@ -982,8 +1035,8 @@ class FullBottomSheet(context: Context, attrs: AttributeSet?, defStyleAttr: Int,
 		}
 	}
 
+	// 处理按键事件
 	override fun onKeyDown(keyCode: Int, event: KeyEvent?): Boolean {
-
 		return when (keyCode) {
 			KeyEvent.KEYCODE_SPACE -> {
 				instance?.playOrPause(); true
@@ -1001,6 +1054,7 @@ class FullBottomSheet(context: Context, attrs: AttributeSet?, defStyleAttr: Int,
 		}
 	}
 
+	// 转储播放列表
 	private fun dumpPlaylist(): Pair<MutableList<Int>, MutableList<MediaItem>> {
 		val items = LinkedList<MediaItem>()
 		for (i in 0 until instance!!.mediaItemCount) {
@@ -1016,6 +1070,7 @@ class FullBottomSheet(context: Context, attrs: AttributeSet?, defStyleAttr: Int,
 		return Pair(indexes, items)
 	}
 
+	// 歌词适配器
 	private inner class LyricAdapter(
 		private val lyricList: MutableList<MediaStoreUtils.Lyric>
 	) : MyRecyclerView.Adapter<LyricAdapter.ViewHolder>() {
@@ -1145,7 +1200,7 @@ class FullBottomSheet(context: Context, attrs: AttributeSet?, defStyleAttr: Int,
 		}
 	}
 
-
+	// 播放列表适配器
 	private inner class PlaylistCardAdapter(
 		private val activity: MainActivity
 	) : MyRecyclerView.Adapter<PlaylistCardAdapter.ViewHolder>() {
@@ -1154,12 +1209,9 @@ class FullBottomSheet(context: Context, attrs: AttributeSet?, defStyleAttr: Int,
 		override fun onCreateViewHolder(
 			parent: ViewGroup,
 			viewType: Int
-		): PlaylistCardAdapter.ViewHolder =
-			ViewHolder(
-				LayoutInflater
-					.from(parent.context)
-					.inflate(R.layout.adapter_list_card_playlist, parent, false),
-			)
+		): PlaylistCardAdapter.ViewHolder = ViewHolder(
+		LayoutInflater.from(parent.context).inflate(R.layout.adapter_list_card_playlist, parent, false),
+		)
 
 		override fun onBindViewHolder(holder: ViewHolder, position: Int) {
 			val item = playlist.second[playlist.first[holder.bindingAdapterPosition]]
@@ -1210,6 +1262,7 @@ class FullBottomSheet(context: Context, attrs: AttributeSet?, defStyleAttr: Int,
 			val closeButton: MaterialButton = view.findViewById(R.id.close)
 		}
 
+		// 移动播放列表项目
 		fun onRowMoved(from: Int, to: Int) {
 			val mediaController = activity.getPlayer()
 			val from1 = playlist.first.removeAt(from)
@@ -1224,7 +1277,7 @@ class FullBottomSheet(context: Context, attrs: AttributeSet?, defStyleAttr: Int,
 		}
 	}
 
-
+	// 播放列表移动回调
 	private class PlaylistCardMoveCallback(private val touchHelperContract: (Int, Int) -> Unit) :
 		ItemTouchHelper.Callback() {
 		override fun isLongPressDragEnabled(): Boolean {
@@ -1290,7 +1343,7 @@ class FullBottomSheet(context: Context, attrs: AttributeSet?, defStyleAttr: Int,
 
 	 */
 
-
+	// 更新歌词
 	fun updateLyric(duration: Long?) {
 		if (bottomSheetFullLyricList.isNotEmpty()) {
 			val newIndex: Int
@@ -1321,6 +1374,7 @@ class FullBottomSheet(context: Context, attrs: AttributeSet?, defStyleAttr: Int,
 		}
 	}
 
+	// 创建平滑滚动器
 	private fun createSmoothScroller() =
 		object : LinearSmoothScroller(context) {
 			override fun calculateDtToFit(
@@ -1348,6 +1402,7 @@ class FullBottomSheet(context: Context, attrs: AttributeSet?, defStyleAttr: Int,
 			}
 		}
 
+	// 进度位置Runnable
 	private val positionRunnable = object : Runnable {
 		override fun run() {
 			if (!runnableRunning) return
@@ -1371,6 +1426,7 @@ class FullBottomSheet(context: Context, attrs: AttributeSet?, defStyleAttr: Int,
 		}
 	}
 
+	// 重置歌词位置
 	private fun resetToDefaultLyricPosition() {
 		val smoothScroller = createSmoothScroller()
 		smoothScroller.targetPosition = 0
@@ -1379,5 +1435,4 @@ class FullBottomSheet(context: Context, attrs: AttributeSet?, defStyleAttr: Int,
 		)
 		bottomSheetFullLyricAdapter.updateHighlight(0)
 	}
-
 }
