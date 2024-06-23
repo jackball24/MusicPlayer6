@@ -10,7 +10,7 @@ import org.akanework.gramophone.logic.utils.MediaStoreUtils
  *   A ViewModel that contains library information.
  * Used across the application.
  *
- * @author AkaneTan, nift4
+ * @author 时空L0k1
  */
 class LibraryViewModel : ViewModel() {
     val mediaItemList: MutableLiveData<List<MediaItem>> = MutableLiveData()

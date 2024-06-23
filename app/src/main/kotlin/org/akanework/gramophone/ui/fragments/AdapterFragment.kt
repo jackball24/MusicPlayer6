@@ -25,7 +25,7 @@ import org.akanework.gramophone.ui.adapters.SongAdapter
  *   This fragment is the container for any list that contains
  * recyclerview in the program.
  *
- * @author nift4
+ * @author 时空L0k1
  */
 class AdapterFragment : BaseFragment(null) {
     private val libraryViewModel: LibraryViewModel by activityViewModels()
@@ -61,7 +61,6 @@ class AdapterFragment : BaseFragment(null) {
 
     override fun onDestroyView() {
         super.onDestroyView()
-        // TODO is this really needed? if yes, move it to MyRecyclerView to make it global
         adapter.concatAdapter.adapters.forEach {
             it.onDetachedFromRecyclerView(recyclerView)
         }

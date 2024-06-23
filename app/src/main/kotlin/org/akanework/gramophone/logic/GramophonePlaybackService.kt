@@ -230,8 +230,7 @@ class GramophonePlaybackService : MediaLibraryService(), MediaSessionService.Lis
                     )
                     .setExtensionRendererMode(DefaultRenderersFactory.EXTENSION_RENDERER_MODE_PREFER),
                 GramophoneMediaSourceFactory(this)
-                /* .setMp3ExtractorFlags(Mp3Extractor.FLAG_ENABLE_INDEX_SEEKING))
-            TODO flag breaks playback of AcousticGuitar.mp3, report exo bug + add UI toggle*/
+                /* .setMp3ExtractorFlags(Mp3Extractor.FLAG_ENABLE_INDEX_SEEKING))*/
             )
                 .setWakeMode(C.WAKE_MODE_LOCAL)
                 .setSkipSilenceEnabled(prefs.getBooleanStrict("skip_silence", false))

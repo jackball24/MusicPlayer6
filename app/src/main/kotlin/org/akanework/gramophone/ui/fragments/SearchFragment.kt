@@ -30,10 +30,10 @@ import org.akanework.gramophone.ui.adapters.SongAdapter
  *   A fragment that contains a search bar which browses
  * the library finding items matching user input.
  *
- * @author AkaneTan
+ * @author grizzly03
  */
 class SearchFragment : BaseFragment(false) {
-    // TODO this class leaks InsetSourceControl
+
     private val handler = Handler(Looper.getMainLooper())
     private val libraryViewModel: LibraryViewModel by activityViewModels()
     private val filteredList: MutableList<MediaItem> = mutableListOf()
@@ -65,7 +65,7 @@ class SearchFragment : BaseFragment(false) {
         recyclerView.fastScroll(songAdapter, songAdapter.itemHeightHelper)
 
         editText.addTextChangedListener { rawText ->
-            // TODO sort results by match quality? (using NaturalOrderHelper)
+
             if (rawText.isNullOrBlank()) {
                 songAdapter.updateList(listOf(), now = true, true)
             } else {

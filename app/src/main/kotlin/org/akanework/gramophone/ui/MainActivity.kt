@@ -44,7 +44,7 @@ import org.akanework.gramophone.ui.fragments.BaseFragment
  *   Core of gramophone, one and the only activity
  * used across the application.
  *
- * @author AkaneTan, nift4
+ * @author 时空L0k1,grizzly03
  */
 class MainActivity : AppCompatActivity() {
 
@@ -219,7 +219,6 @@ class MainActivity : AppCompatActivity() {
                 updateLibrary()
             } else {
                 reportFullyDrawn()
-                // TODO: Show a prompt here
             }
         }
     }

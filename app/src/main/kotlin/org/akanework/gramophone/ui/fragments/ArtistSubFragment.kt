@@ -28,7 +28,7 @@ import kotlin.properties.Delegates
  *   Separated from GeneralSubFragment and will be
  * merged into it in future development.
  *
- * @author nift4
+ * @author 时空L0k1
  * @see BaseFragment
  * @see GeneralSubFragment
  */
@@ -49,7 +49,6 @@ class ArtistSubFragment : BaseFragment(true), PopupTextProvider {
     ): View? {
         gridPaddingDecoration = GridPaddingDecoration(requireContext())
         if (libraryViewModel.artistItemList.value == null || libraryViewModel.albumArtistItemList.value == null) {
-            // TODO make it wait for lib load instead of breaking state restore
             // (still better than crashing, though)
             requireActivity().supportFragmentManager.popBackStack()
             return null

@@ -15,7 +15,7 @@ import org.akanework.gramophone.ui.MainActivity
  * overlapping colors more convenient. It can also manage
  * whether to show up bottom's mini player or not.
  *
- * @author AkaneTan, nift4
+ * @author 时空L0k1,grizzly03
  * @see MainActivity
  */
 abstract class BaseFragment(val wantsPlayer: Boolean? = null) : Fragment() {
