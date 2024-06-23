@@ -40,6 +40,7 @@
 		app:layout_constraintEnd_toEndOf="parent"
 		app:layout_constraintStart_toStartOf="parent"
 		app:layout_constraintTop_toBottomOf="@id/slide_down"
+		app:layout_constraintBottom_toTopOf="@id/full_song_name"
 		app:strokeWidth="0dp">
 
 		<ImageView
@@ -52,46 +53,38 @@
 
 	</com.google.android.material.card.MaterialCardView>
 
-		<LinearLayout
-			android:id="@+id/textLayout"
-			android:layout_width="match_parent"
-			android:layout_height="wrap_content"
-			android:layout_marginHorizontal="28dp"
-			android:layout_marginTop="10dp"
-			android:gravity="center"
-			android:minHeight="70dp"
-			android:orientation="vertical"
-			app:layout_constraintBottom_toTopOf="@id/slider"
-			app:layout_constraintEnd_toEndOf="parent"
-			app:layout_constraintStart_toStartOf="parent"
-			app:layout_constraintTop_toBottomOf="@id/album_cover_frame">
+
 
 			<org.akanework.gramophone.ui.components.MarqueeTextView
 				android:id="@+id/full_song_name"
 				android:layout_width="match_parent"
-				android:layout_height="wrap_content"
+				android:layout_height="28dp"
 				android:gravity="center"
 				android:scrollbars="none"
 				android:textColor="?attr/colorOnSurface"
 				android:textFontWeight="500"
 				android:fontFamily="sans-serif"
 				android:textSize="22sp"
+				app:layout_constraintTop_toBottomOf="@id/album_cover_frame"
+				app:layout_constraintBottom_toTopOf="@id/full_song_artist"
+				android:layout_marginTop="10dp"
 				tools:text="Artifiction" />
 
 			<org.akanework.gramophone.ui.components.MarqueeTextView
 				android:id="@+id/full_song_artist"
 				android:layout_width="match_parent"
 				android:layout_height="wrap_content"
-				android:layout_marginTop="3dp"
 				android:gravity="center"
 				android:scrollbars="none"
 				android:textColor="?attr/colorOnSurfaceVariant"
 				android:textFontWeight="500"
 				android:fontFamily="sans-serif"
 				android:textSize="17sp"
+				app:layout_constraintTop_toBottomOf="@id/full_song_name"
+				app:layout_constraintBottom_toTopOf="@id/slider"
 				tools:text="Artifiction" />
 
-		</LinearLayout>
+
 
 		<FrameLayout
 			android:id="@+id/slider"
@@ -409,12 +402,14 @@
 	<org.akanework.gramophone.logic.ui.MyRecyclerView
 		android:id="@+id/lyric_frame"
 		android:layout_width="match_parent"
-		android:layout_height="match_parent"
+		android:layout_height="0dp"
 		android:background="?attr/colorSurface"
 		android:clipToPadding="false"
 		android:clipChildren="false"
 		android:scrollbars="none"
 		android:visibility="gone"
+		app:layout_constraintTop_toTopOf="parent"
+		app:layout_constraintBottom_toBottomOf="@id/album_cover_frame"
 		tools:listitem="@layout/lyrics" />
 
 </merge>
