@@ -454,7 +454,7 @@ class FullBottomSheet(context: Context, attrs: AttributeSet?, defStyleAttr: Int,
 				bottomSheetFullLyricRecyclerView.fadOutAnimation(LYRIC_FADE_TRANSITION_SEC)
 				bottomSheetFullLyricRecyclerView.visibility = View.GONE
 				bottomSheetFullTitle.setTextAnimation(instance?.currentMediaItem?.mediaMetadata?.title, skipAnimation = true)
-				bottomSheetFullSubtitle.setTextAnimation(instance?.currentMediaItem?.mediaMetadata?.artist, skipAnimation = true )
+				bottomSheetFullSubtitle.setTextAnimation(instance?.currentMediaItem?.mediaMetadata?.artist?: context.getString(R.string.unknown_artist), skipAnimation = true )
 			} else {
 				bottomSheetFullLyricRecyclerView.fadInAnimation(LYRIC_FADE_TRANSITION_SEC)
 				bottomSheetFullLyricRecyclerView.visibility = View.VISIBLE
