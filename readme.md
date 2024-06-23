@@ -96,10 +96,10 @@
 
 感谢以下项目带来的灵感：
 
-[歌词下载](https://github.com/lambada10/songsync)
-[歌词视图组件](https://github.com/Moriafly/LyricViewX)
-[一个简陋小项目](https://github.com/RoseTame/MusicPlayer)
-[成熟且高级的播放器](https://github.com/rRemix/APlayer)
-[现代化大项目](https://github.com/RetroMusicPlayer/RetroMusicPlayer)
-[简单的MusicPlayer](https://github.com/SimpleMobileTools/Simple-Music-Player)
+- [歌词下载](https://github.com/lambada10/songsync)
+- [歌词视图组件](https://github.com/Moriafly/LyricViewX)
+- [一个简陋小项目](https://github.com/RoseTame/MusicPlayer)
+- [成熟且高级的播放器](https://github.com/rRemix/APlayer)
+- [现代化大项目](https://github.com/RetroMusicPlayer/RetroMusicPlayer)
+- [简单的MusicPlayer](https://github.com/SimpleMobileTools/Simple-Music-Player)
 
