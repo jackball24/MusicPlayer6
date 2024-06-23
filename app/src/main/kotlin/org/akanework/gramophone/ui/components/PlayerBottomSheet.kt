@@ -40,6 +40,7 @@ import org.akanework.gramophone.logic.fadInAnimation
 import org.akanework.gramophone.logic.fadOutAnimation
 import org.akanework.gramophone.logic.getBooleanStrict
 import org.akanework.gramophone.logic.playOrPause
+import org.akanework.gramophone.logic.setTextAnimation
 import org.akanework.gramophone.logic.startAnimation
 import org.akanework.gramophone.logic.ui.MyBottomSheetBehavior
 import org.akanework.gramophone.ui.MainActivity
@@ -226,6 +227,8 @@ class PlayerBottomSheet private constructor(
                     ) {
                         fullPlayer.bottomSheetFullLyricRecyclerView.fadOutAnimation(FullBottomSheet.LYRIC_FADE_TRANSITION_SEC)
                         fullPlayer.bottomSheetLyricButton.isChecked = false
+                        fullPlayer.bottomSheetFullTitle.setTextAnimation(instance?.currentMediaItem?.mediaMetadata?.title, skipAnimation = true)
+                        fullPlayer.bottomSheetFullSubtitle.setTextAnimation(instance?.currentMediaItem?.mediaMetadata?.artist, skipAnimation = true)
                     } else {
                         standardBottomSheetBehavior!!.handleBackInvoked()
                     }
