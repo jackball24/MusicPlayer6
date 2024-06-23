@@ -96,10 +96,10 @@
 
 感谢以下项目带来的灵感：
 
-[歌词下载]: Lambada10/SongSync：用于下载音乐库中歌曲的歌词（.lrc 文件）的 Android 应用程序。 (github.com)(https://github.com/lambada10/songsync)
-[歌词视图组件]: Moriafly/LyricViewX: LyricViewX is a beautiful Lyrics View for Android. (github.com)(https://github.com/Moriafly/LyricViewX)
-[简陋小项目实现]: RoseTame/MusicPlayer: 安卓开发小项目 音乐播放器 MusicPlayer (github.com)(https://github.com/RoseTame/MusicPlayer)
-[一个成熟、高级的播放器]: rRemix/APlayer: Android Music Player (github.com)(https://github.com/rRemix/APlayer)
-[现代化的大项目]: RetroMusicPlayer/RetroMusicPlayer: Best Material You Design music player for Android (github.com)(https://github.com/RetroMusicPlayer/RetroMusicPlayer)
-[简单的musicPlayer构建]: SimpleMobileTools/Simple-Music-Player: A clean music player with a customizable widget, stylish interface and no ads. (github.com)(https://github.com/SimpleMo
+[歌词下载](https://github.com/lambada10/songsync)
+[歌词视图组件](https://github.com/Moriafly/LyricViewX)
+[一个简陋小项目](https://github.com/RoseTame/MusicPlayer)
+[成熟且高级的播放器](https://github.com/rRemix/APlayer)
+[现代化大项目](https://github.com/RetroMusicPlayer/RetroMusicPlayer)
+[简单的MusicPlayer](https://github.com/SimpleMobileTools/Simple-Music-Player)
 
