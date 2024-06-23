@@ -1,20 +1,3 @@
-/*
- *     Copyright (C) 2024 Akane Foundation
- *
- *     Gramophone is free software: you can redistribute it and/or modify
- *     it under the terms of the GNU General Public License as published by
- *     the Free Software Foundation, either version 3 of the License, or
- *     (at your option) any later version.
- *
- *     Gramophone is distributed in the hope that it will be useful,
- *     but WITHOUT ANY WARRANTY; without even the implied warranty of
- *     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- *     GNU General Public License for more details.
- *
- *     You should have received a copy of the GNU General Public License
- *     along with this program.  If not, see <https://www.gnu.org/licenses/>.
- */
-
 package org.akanework.gramophone.logic
 
 import android.annotation.SuppressLint
@@ -31,9 +14,7 @@ import android.net.Uri
 import android.os.Build
 import android.os.Bundle
 import android.os.Handler
-import android.os.Looper
 import android.os.Message
-import android.os.StrictMode
 import android.view.View
 import android.view.ViewGroup.MarginLayoutParams
 import android.view.WindowInsets
@@ -62,7 +43,6 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.sync.Semaphore
-import org.akanework.gramophone.BuildConfig
 import org.akanework.gramophone.logic.GramophonePlaybackService.Companion.SERVICE_GET_LYRICS
 import org.akanework.gramophone.logic.GramophonePlaybackService.Companion.SERVICE_QUERY_TIMER
 import org.akanework.gramophone.logic.GramophonePlaybackService.Companion.SERVICE_SET_TIMER
@@ -360,20 +340,7 @@ inline fun Semaphore.runInBg(crossinline runnable: suspend () -> Unit) {
 // the whole point of this function is to do literally nothing at all (but without impacting
 // performance) in release builds and ignore StrictMode violations in debug builds
 inline fun <reified T> allowDiskAccessInStrictMode(relax: Boolean = false, doIt: () -> T): T {
-    return if (BuildConfig.DEBUG) {
-        if (Looper.getMainLooper() != Looper.myLooper()) {
-            if (relax) doIt() else
-                throw IllegalStateException("allowDiskAccessInStrictMode(false) on wrong thread")
-        } else {
-            val policy = StrictMode.allowThreadDiskReads()
-            try {
-                StrictMode.allowThreadDiskWrites()
-                doIt()
-            } finally {
-                StrictMode.setThreadPolicy(policy)
-            }
-        }
-    } else doIt()
+    return  doIt()
 }
 
 inline fun <reified T> SharedPreferences.use(relax: Boolean = false, doIt: SharedPreferences.() -> T): T {

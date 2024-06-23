@@ -1,20 +1,3 @@
-/*
- *     Copyright (C) 2024 Akane Foundation
- *
- *     Gramophone is free software: you can redistribute it and/or modify
- *     it under the terms of the GNU General Public License as published by
- *     the Free Software Foundation, either version 3 of the License, or
- *     (at your option) any later version.
- *
- *     Gramophone is distributed in the hope that it will be useful,
- *     but WITHOUT ANY WARRANTY; without even the implied warranty of
- *     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- *     GNU General Public License for more details.
- *
- *     You should have received a copy of the GNU General Public License
- *     along with this program.  If not, see <https://www.gnu.org/licenses/>.
- */
-
 package org.akanework.gramophone.ui.fragments
 
 import android.os.Bundle
@@ -89,32 +72,6 @@ class GeneralSubFragment : BaseFragment(true) {
                     }
             }
 
-            /*R.id.artist -> {
-                val item = libraryViewModel.artistItemList.value!![position]
-                title = item.title ?: requireContext().getString(R.string.unknown_artist)
-                itemList = item.songList
-            } TODO */
-
-            R.id.genres -> {
-                // Genres
-                val item = libraryViewModel.genreItemList.value!![position]
-                title = item.title ?: requireContext().getString(R.string.unknown_genre)
-                itemList = item.songList
-            }
-
-            R.id.dates -> {
-                // Dates
-                val item = libraryViewModel.dateItemList.value!![position]
-                title = item.title ?: requireContext().getString(R.string.unknown_year)
-                itemList = item.songList
-            }
-
-            /*R.id.album_artist -> {
-                // Album artists
-                val item = libraryViewModel.albumArtistItemList.value!![position]
-                title = item.title ?: requireContext().getString(R.string.unknown_artist)
-                itemList = item.songList
-            } TODO */
 
             R.id.playlist -> {
                 // Playlists

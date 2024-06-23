@@ -1,20 +1,3 @@
-/*
- *     Copyright (C) 2024 Akane Foundation
- *
- *     Gramophone is free software: you can redistribute it and/or modify
- *     it under the terms of the GNU General Public License as published by
- *     the Free Software Foundation, either version 3 of the License, or
- *     (at your option) any later version.
- *
- *     Gramophone is distributed in the hope that it will be useful,
- *     but WITHOUT ANY WARRANTY; without even the implied warranty of
- *     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- *     GNU General Public License for more details.
- *
- *     You should have received a copy of the GNU General Public License
- *     along with this program.  If not, see <https://www.gnu.org/licenses/>.
- */
-
 package org.akanework.gramophone.logic.utils
 
 import android.content.Context
@@ -33,7 +16,6 @@ import androidx.media3.session.MediaSession.MediaItemsWithStartPosition
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
-import org.akanework.gramophone.BuildConfig
 import org.akanework.gramophone.logic.use
 import org.akanework.gramophone.logic.utils.exoplayer.EndedWorkaroundPlayer
 import java.nio.charset.StandardCharsets
@@ -72,9 +54,7 @@ class LastPlayedManager(context: Context,
             Log.i(TAG, "skipped save")
             return
         }
-        if (BuildConfig.DEBUG) {
-            Log.d(TAG, "dumping playlist...")
-        }
+
         val data = dumpPlaylist()
         val repeatMode = controller.repeatMode
         val shuffleModeEnabled = controller.shuffleModeEnabled
@@ -82,10 +62,7 @@ class LastPlayedManager(context: Context,
         val persistent = controller.shufflePersistent
         val ended = controller.playbackState == Player.STATE_ENDED
         CoroutineScope(Dispatchers.Default).launch {
-            if (BuildConfig.DEBUG) {
-                Log.d(TAG, "saving playlist (${data.mediaItems.size} items, repeat $repeatMode, " +
-                        "shuffle $shuffleModeEnabled, ended $ended)...")
-            }
+
             val lastPlayed = PrefsListUtils.dump(
                 data.mediaItems.map {
                     val b = SafeDelimitedStringConcat(":")
@@ -138,9 +115,7 @@ class LastPlayedManager(context: Context,
     }
 
     fun restore(callback: (MediaItemsWithStartPosition?, CircularShuffleOrder.Persistent) -> Unit) {
-        if (BuildConfig.DEBUG) {
-            Log.d(TAG, "decoding playlist...")
-        }
+
         CoroutineScope(Dispatchers.Default).launch {
             val seed = try {
                 CircularShuffleOrder.Persistent.deserialize(prefs.getString("shuffle_persist", null))
@@ -254,10 +229,7 @@ class LastPlayedManager(context: Context,
                     lastPlayedPos
                 )
                 runCallback(callback, seed) {
-                    if (BuildConfig.DEBUG) {
-                        Log.d(TAG, "restoring playlist (${data.mediaItems.size} items, repeat $repeatMode, " +
-                                "shuffle $shuffleModeEnabled, ended $ended)...")
-                    }
+
                     controller.isEnded = ended
                     controller.repeatMode = repeatMode
                     controller.shuffleModeEnabled = shuffleModeEnabled

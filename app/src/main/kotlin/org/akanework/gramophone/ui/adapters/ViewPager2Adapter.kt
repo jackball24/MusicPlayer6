@@ -1,20 +1,3 @@
-/*
- *     Copyright (C) 2024 Akane Foundation
- *
- *     Gramophone is free software: you can redistribute it and/or modify
- *     it under the terms of the GNU General Public License as published by
- *     the Free Software Foundation, either version 3 of the License, or
- *     (at your option) any later version.
- *
- *     Gramophone is distributed in the hope that it will be useful,
- *     but WITHOUT ANY WARRANTY; without even the implied warranty of
- *     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- *     GNU General Public License for more details.
- *
- *     You should have received a copy of the GNU General Public License
- *     along with this program.  If not, see <https://www.gnu.org/licenses/>.
- */
-
 package org.akanework.gramophone.ui.adapters
 
 import android.os.Bundle
@@ -36,11 +19,7 @@ class ViewPager2Adapter(
     companion object {
         val tabs: ArrayList</* res id */ Int> = arrayListOf(
             R.id.songs,
-            R.id.albums,
             R.id.artists,
-            R.id.genres,
-            R.id.dates,
-            R.id.folders,
             R.id.detailed_folders,
             R.id.playlists,
         )
@@ -49,11 +28,7 @@ class ViewPager2Adapter(
     fun getLabelResId(position: Int): Int =
         when (tabs[position]) {
             R.id.songs -> R.string.category_songs
-            R.id.albums -> R.string.category_albums
             R.id.artists -> R.string.category_artists
-            R.id.genres -> R.string.category_genres
-            R.id.dates -> R.string.category_dates
-            R.id.folders -> R.string.filesystem
             R.id.detailed_folders -> R.string.folders
             R.id.playlists -> R.string.category_playlists
             else -> throw IllegalArgumentException("Invalid position: $position")

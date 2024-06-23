@@ -1,20 +1,3 @@
-/*
- *     Copyright (C) 2024 Akane Foundation
- *
- *     Gramophone is free software: you can redistribute it and/or modify
- *     it under the terms of the GNU General Public License as published by
- *     the Free Software Foundation, either version 3 of the License, or
- *     (at your option) any later version.
- *
- *     Gramophone is distributed in the hope that it will be useful,
- *     but WITHOUT ANY WARRANTY; without even the implied warranty of
- *     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- *     GNU General Public License for more details.
- *
- *     You should have received a copy of the GNU General Public License
- *     along with this program.  If not, see <https://www.gnu.org/licenses/>.
- */
-
 package org.akanework.gramophone.ui.fragments
 
 import android.annotation.SuppressLint
@@ -79,20 +62,6 @@ class ViewPagerFragment : BaseFragment(true) {
             when (it.itemId) {
                 R.id.search -> {
                     (requireActivity() as MainActivity).startFragment(SearchFragment())
-                }
-                R.id.equalizer -> {
-                    val intent = Intent("android.media.action.DISPLAY_AUDIO_EFFECT_CONTROL_PANEL")
-                        .addCategory("android.intent.category.CATEGORY_CONTENT_MUSIC")
-                    try {
-                        (requireActivity() as MainActivity).startingActivity.launch(intent)
-                    } catch (e: ActivityNotFoundException) {
-                        // Let's show a toast here if no system inbuilt EQ was found.
-                        Toast.makeText(
-                            requireContext(),
-                            R.string.equalizer_not_found,
-                            Toast.LENGTH_LONG
-                        ).show()
-                    }
                 }
                 R.id.refresh -> {
                     val activity = requireActivity() as MainActivity

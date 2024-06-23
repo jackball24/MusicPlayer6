@@ -2,12 +2,16 @@ package org.akanework.gramophone.ui.components
 
 import android.animation.ValueAnimator
 import android.annotation.SuppressLint
+import android.content.BroadcastReceiver
 import android.content.Context
+import android.content.Intent
+import android.content.IntentFilter
 import android.content.SharedPreferences
 import android.content.res.ColorStateList
 import android.graphics.Bitmap
 import android.graphics.drawable.BitmapDrawable
 import android.graphics.drawable.TransitionDrawable
+import android.media.AudioManager
 import android.text.format.DateFormat
 import android.util.AttributeSet
 import android.util.Size
@@ -69,6 +73,7 @@ import org.akanework.gramophone.logic.GramophonePlaybackService
 import org.akanework.gramophone.logic.clone
 import org.akanework.gramophone.logic.dpToPx
 import org.akanework.gramophone.logic.fadInAnimation
+import org.akanework.gramophone.logic.fadOutAnimation
 import org.akanework.gramophone.logic.getBooleanStrict
 import org.akanework.gramophone.logic.getFile
 import org.akanework.gramophone.logic.getIntStrict
@@ -111,6 +116,12 @@ class FullBottomSheet(context: Context, attrs: AttributeSet?, defStyleAttr: Int,
 	private var isUserTracking = false
 	private var runnableRunning = false
 	private var firstTime = false
+	// 添加AudioManager变量
+	private val audioManager: AudioManager = context.getSystemService(Context.AUDIO_SERVICE) as AudioManager
+
+	// 初始化音量相关的变量
+	private val maxVolume = audioManager.getStreamMaxVolume(AudioManager.STREAM_MUSIC)
+	private val currentVolume = audioManager.getStreamVolume(AudioManager.STREAM_MUSIC)
 
 	private val prefs = PreferenceManager.getDefaultSharedPreferences(context)
 
@@ -162,9 +173,31 @@ class FullBottomSheet(context: Context, attrs: AttributeSet?, defStyleAttr: Int,
 			isUserTracking = false
 		}
 	}
+	private val volumeSeekBarChangeListener = object : SeekBar.OnSeekBarChangeListener {
+		override fun onProgressChanged(seekBar: SeekBar?, progress: Int, fromUser: Boolean) {
+			if (fromUser) {
+				audioManager.setStreamVolume(AudioManager.STREAM_MUSIC, progress, 0)
+			}
+		}
+
+		override fun onStartTrackingTouch(seekBar: SeekBar?) {}
+
+		override fun onStopTrackingTouch(seekBar: SeekBar?) {}
+	}
+
+	// 定义BroadcastReceiver来监听音量变化
+	private val volumeReceiver = object : BroadcastReceiver() {
+		override fun onReceive(context: Context?, intent: Intent?) {
+			if (intent?.action == "android.media.VOLUME_CHANGED_ACTION") {
+				val newVolume = audioManager.getStreamVolume(AudioManager.STREAM_MUSIC)
+				bottomSheetVolumeSeekBar.progress = newVolume
+			}
+		}
+	}
+
 	private val bottomSheetFullCover: ImageView
-	private val bottomSheetFullTitle: TextView
-	private val bottomSheetFullSubtitle: TextView
+	val bottomSheetFullTitle: TextView
+	val bottomSheetFullSubtitle: TextView
 	private val bottomSheetFullControllerButton: MaterialButton
 	private val bottomSheetFullNextButton: MaterialButton
 	private val bottomSheetFullPreviousButton: MaterialButton
@@ -174,10 +207,10 @@ class FullBottomSheet(context: Context, attrs: AttributeSet?, defStyleAttr: Int,
 	private val bottomSheetShuffleButton: MaterialButton
 	private val bottomSheetLoopButton: MaterialButton
 	private val bottomSheetPlaylistButton: MaterialButton
-	private val bottomSheetTimerButton: MaterialButton
 	private val bottomSheetFavoriteButton: MaterialButton
 	val bottomSheetLyricButton: MaterialButton
 	private val bottomSheetFullSeekBar: SeekBar
+	private val bottomSheetVolumeSeekBar:SeekBar
 	private val bottomSheetFullSlider: Slider
 	private val bottomSheetFullCoverFrame: MaterialCardView
 	val bottomSheetFullLyricRecyclerView: RecyclerView
@@ -206,15 +239,24 @@ class FullBottomSheet(context: Context, attrs: AttributeSet?, defStyleAttr: Int,
 		bottomSheetFullPosition = findViewById(R.id.position)
 		bottomSheetFullDuration = findViewById(R.id.duration)
 		bottomSheetFullSeekBar = findViewById(R.id.slider_squiggly)
+		bottomSheetVolumeSeekBar = findViewById(R.id.volume)
 		bottomSheetFullSlider = findViewById(R.id.slider_vert)
 		bottomSheetFullSlideUpButton = findViewById(R.id.slide_down)
 		bottomSheetShuffleButton = findViewById(R.id.sheet_random)
 		bottomSheetLoopButton = findViewById(R.id.sheet_loop)
-		bottomSheetTimerButton = findViewById(R.id.timer)
 		bottomSheetFavoriteButton = findViewById(R.id.favor)
 		bottomSheetPlaylistButton = findViewById(R.id.playlist)
 		bottomSheetLyricButton = findViewById(R.id.lyrics)
 		bottomSheetFullLyricRecyclerView = findViewById(R.id.lyric_frame)
+		// 初始化音量SeekBar
+		bottomSheetVolumeSeekBar.max = maxVolume
+		bottomSheetVolumeSeekBar.progress = currentVolume
+		bottomSheetVolumeSeekBar.setOnSeekBarChangeListener(volumeSeekBarChangeListener)
+
+		// 注册音量变化的BroadcastReceiver
+		val filter = IntentFilter("android.media.VOLUME_CHANGED_ACTION")
+		context.registerReceiver(volumeReceiver, filter)
+
 		fullPlayerFinalColor = MaterialColors.getColor(
 			this,
 			com.google.android.material.R.attr.colorSurface
@@ -252,7 +294,7 @@ class FullBottomSheet(context: Context, attrs: AttributeSet?, defStyleAttr: Int,
 		prefs.registerOnSharedPreferenceChangeListener(this)
 		activity.controllerViewModel.customCommandListeners.addCallback(activity.lifecycle) { _, command, _ ->
 			when (command.customAction) {
-				GramophonePlaybackService.SERVICE_TIMER_CHANGED -> updateTimer()
+
 
 				GramophonePlaybackService.SERVICE_GET_LYRICS -> {
 					val parsedLyrics = instance?.getLyrics()
@@ -313,22 +355,7 @@ class FullBottomSheet(context: Context, attrs: AttributeSet?, defStyleAttr: Int,
 			)
 		}
 
-		bottomSheetTimerButton.setOnClickListener {
-			ViewCompat.performHapticFeedback(it, HapticFeedbackConstantsCompat.CONTEXT_CLICK)
-			val picker =
-				MaterialTimePicker
-					.Builder()
-					.setHour((instance?.getTimer() ?: 0) / 3600 / 1000)
-					.setMinute(((instance?.getTimer() ?: 0) % (3600 * 1000)) / (60 * 1000))
-					.setTimeFormat(TimeFormat.CLOCK_24H)
-					.setInputMode(MaterialTimePicker.INPUT_MODE_KEYBOARD)
-					.build()
-			picker.addOnPositiveButtonClickListener {
-				val destinationTime: Int = picker.hour * 1000 * 3600 + picker.minute * 1000 * 60
-				instance?.setTimer(destinationTime)
-			}
-			picker.show(activity.supportFragmentManager, "timer")
-		}
+
 
 		bottomSheetLoopButton.setOnClickListener {
 			ViewCompat.performHapticFeedback(it, HapticFeedbackConstantsCompat.CONTEXT_CLICK)
@@ -340,18 +367,7 @@ class FullBottomSheet(context: Context, attrs: AttributeSet?, defStyleAttr: Int,
 			}
 		}
 
-		/*
-		bottomSheetFavoriteButton.addOnCheckedChangeListener { _, isChecked ->
-			/*
-			if (isChecked) {
-				instance.currentMediaItem?.let { insertIntoPlaylist(it) }
-			} else {
-				instance.currentMediaItem?.let { removeFromPlaylist(it) }
-			}
-			 */
-		}
 
-		 */
 
 		bottomSheetPlaylistButton.setOnClickListener {
 			ViewCompat.performHapticFeedback(it, HapticFeedbackConstantsCompat.CONTEXT_CLICK)
@@ -434,7 +450,18 @@ class FullBottomSheet(context: Context, attrs: AttributeSet?, defStyleAttr: Int,
 
 		bottomSheetLyricButton.setOnClickListener {
 			ViewCompat.performHapticFeedback(it, HapticFeedbackConstantsCompat.CONTEXT_CLICK)
-			bottomSheetFullLyricRecyclerView.fadInAnimation(LYRIC_FADE_TRANSITION_SEC)
+			if(bottomSheetFullLyricRecyclerView.visibility == View.VISIBLE) {
+				bottomSheetFullLyricRecyclerView.fadOutAnimation(LYRIC_FADE_TRANSITION_SEC)
+				bottomSheetFullLyricRecyclerView.visibility = View.GONE
+				bottomSheetFullTitle.setTextAnimation(instance?.currentMediaItem?.mediaMetadata?.title, skipAnimation = true)
+				bottomSheetFullSubtitle.setTextAnimation(instance?.currentMediaItem?.mediaMetadata?.artist?: context.getString(R.string.unknown_artist), skipAnimation = true )
+			} else {
+				bottomSheetFullLyricRecyclerView.fadInAnimation(LYRIC_FADE_TRANSITION_SEC)
+				bottomSheetFullLyricRecyclerView.visibility = View.VISIBLE
+				bottomSheetFullTitle.setTextAnimation(null)
+				bottomSheetFullSubtitle.setTextAnimation(null)
+			}
+
 		}
 
 		bottomSheetShuffleButton.setOnClickListener {
@@ -451,7 +478,6 @@ class FullBottomSheet(context: Context, attrs: AttributeSet?, defStyleAttr: Int,
 		activity.controllerViewModel.addControllerCallback(activity.lifecycle) { _, _ ->
 			firstTime = true
 			instance?.addListener(this@FullBottomSheet)
-			updateTimer()
 			onRepeatModeChanged(instance?.repeatMode ?: Player.REPEAT_MODE_OFF)
 			onShuffleModeEnabledChanged(instance?.shuffleModeEnabled ?: false)
 			onPlaybackStateChanged(instance?.playbackState ?: Player.STATE_IDLE)
@@ -460,30 +486,15 @@ class FullBottomSheet(context: Context, attrs: AttributeSet?, defStyleAttr: Int,
 				Player.MEDIA_ITEM_TRANSITION_REASON_PLAYLIST_CHANGED
 			)
 			firstTime = false
-			/*
-			if (activity.libraryViewModel.playlistList.value!![MediaStoreUtils.favPlaylistPosition]
-					.songList.contains(instance.currentMediaItem)) {
-				bottomSheetFavoriteButton.isChecked = true
-				// TODO
-			} else {
-				bottomSheetFavoriteButton.isChecked = false
-				// TODO
-			}
 
-			 */
 		}
 	}
 
-	private fun updateTimer() {
-		val t = instance?.getTimer()
-		bottomSheetTimerButton.isChecked = t != null
-		TooltipCompat.setTooltipText(bottomSheetTimerButton,
-			if (t != null) context.getString(R.string.timer_expiry,
-				DateFormat.getTimeFormat(context).format(System.currentTimeMillis() + t)
-			) else context.getString(R.string.timer)
-		)
+	// 取消注册BroadcastReceiver
+	override fun onDetachedFromWindow() {
+		super.onDetachedFromWindow()
+		context.unregisterReceiver(volumeReceiver)
 	}
-
 	override fun onSharedPreferenceChanged(sharedPreferences: SharedPreferences?, key: String?) {
 		if (key == "color_accuracy" || key == "content_based_color") {
 			if (DynamicColors.isDynamicColorAvailable() &&
@@ -502,15 +513,15 @@ class FullBottomSheet(context: Context, attrs: AttributeSet?, defStyleAttr: Int,
 	}
 
 	private fun refreshSettings(key: String?) {
-		if (key == null || key == "default_progress_bar") {
-			if (prefs.getBooleanStrict("default_progress_bar", false)) {
+//		if (key == null || key == "default_progress_bar") {
+//			if (prefs.getBooleanStrict("default_progress_bar", true)) {
+//				bottomSheetFullSlider.visibility = View.GONE
+//				bottomSheetFullSeekBar.visibility = View.VISIBLE
+//			} else {
 				bottomSheetFullSlider.visibility = View.VISIBLE
 				bottomSheetFullSeekBar.visibility = View.GONE
-			} else {
-				bottomSheetFullSlider.visibility = View.GONE
-				bottomSheetFullSeekBar.visibility = View.VISIBLE
-			}
-		}
+//			}
+//		}
 		if (key == null || key == "centered_title") {
 			if (prefs.getBooleanStrict("centered_title", true)) {
 				bottomSheetFullTitle.gravity = Gravity.CENTER
@@ -588,7 +599,6 @@ class FullBottomSheet(context: Context, attrs: AttributeSet?, defStyleAttr: Int,
 				context,
 				options
 			).apply {
-				// TODO does https://stackoverflow.com/a/58004553 describe this or another bug? will google ever fix anything?
 				resources.configuration.uiMode = context.resources.configuration.uiMode
 			}
 
@@ -779,8 +789,6 @@ class FullBottomSheet(context: Context, attrs: AttributeSet?, defStyleAttr: Int,
 				colorPrimary
 			)
 
-			bottomSheetTimerButton.iconTint =
-				ColorStateList.valueOf(colorOnSurface)
 			bottomSheetPlaylistButton.iconTint =
 				ColorStateList.valueOf(colorOnSurface)
 			bottomSheetShuffleButton.iconTint =
@@ -865,10 +873,15 @@ class FullBottomSheet(context: Context, attrs: AttributeSet?, defStyleAttr: Int,
 			} else {
 				load(mediaItem?.mediaMetadata?.artworkUri)
 			}
+
 			bottomSheetFullTitle.setTextAnimation(mediaItem?.mediaMetadata?.title, skipAnimation = firstTime)
 			bottomSheetFullSubtitle.setTextAnimation(
 				mediaItem?.mediaMetadata?.artist ?: context.getString(R.string.unknown_artist), skipAnimation = firstTime
 			)
+			if(bottomSheetFullLyricRecyclerView.visibility == View.VISIBLE) {
+				bottomSheetFullTitle.setTextAnimation(null)
+				bottomSheetFullSubtitle.setTextAnimation(null)
+			}
 			bottomSheetFullDuration.text =
 				mediaItem?.mediaMetadata?.extras?.getLong("Duration")
 					?.let { CalculationUtils.convertDurationToTimeStamp(it) }
@@ -881,16 +894,6 @@ class FullBottomSheet(context: Context, attrs: AttributeSet?, defStyleAttr: Int,
 				}
 			}
 
-			/*
-			if (activity.libraryViewModel.playlistList.value!![MediaStoreUtils.favPlaylistPosition]
-					.songList.contains(instance.currentMediaItem)
-			) {
-				// TODO
-			} else {
-				// TODO
-			}
-
-			 */
 		} else {
 			lastDisposable?.dispose()
 			lastDisposable = null
@@ -980,7 +983,7 @@ class FullBottomSheet(context: Context, attrs: AttributeSet?, defStyleAttr: Int,
 	}
 
 	override fun onKeyDown(keyCode: Int, event: KeyEvent?): Boolean {
-		//android.util.Log.e("hi","$keyCode") TODO this method is no-op, but why?
+
 		return when (keyCode) {
 			KeyEvent.KEYCODE_SPACE -> {
 				instance?.playOrPause(); true
@@ -1071,11 +1074,11 @@ class FullBottomSheet(context: Context, attrs: AttributeSet?, defStyleAttr: Int,
 					this.gravity = Gravity.START
 				}
 
-				val textSize = if (lyric.isTranslation) 20f else 28f
-				val paddingTop = (if (lyric.isTranslation) 2 else 18).dpToPx(context)
+				val textSize = if (lyric.isTranslation) 20f else 24f
+				val paddingTop = (if (lyric.isTranslation) 2 else 10).dpToPx(context)
 				val paddingBottom = (if (position + 1 < lyricList.size &&
 					lyricList[position + 1].isTranslation
-				) 2 else 18).dpToPx(context)
+				) 2 else 10).dpToPx(context)
 
 				this.textSize = textSize
 				setPadding(10.dpToPx(context), paddingTop, 10.dpToPx(context), paddingBottom)
