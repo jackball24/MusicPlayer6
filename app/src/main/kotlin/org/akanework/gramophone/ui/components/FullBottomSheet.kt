@@ -196,8 +196,8 @@ class FullBottomSheet(context: Context, attrs: AttributeSet?, defStyleAttr: Int,
 	}
 
 	private val bottomSheetFullCover: ImageView
-	private val bottomSheetFullTitle: TextView
-	private val bottomSheetFullSubtitle: TextView
+	val bottomSheetFullTitle: TextView
+	val bottomSheetFullSubtitle: TextView
 	private val bottomSheetFullControllerButton: MaterialButton
 	private val bottomSheetFullNextButton: MaterialButton
 	private val bottomSheetFullPreviousButton: MaterialButton
