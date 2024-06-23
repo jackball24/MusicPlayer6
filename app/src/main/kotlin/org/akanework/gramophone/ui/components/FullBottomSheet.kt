@@ -452,11 +452,12 @@ class FullBottomSheet(context: Context, attrs: AttributeSet?, defStyleAttr: Int,
 			ViewCompat.performHapticFeedback(it, HapticFeedbackConstantsCompat.CONTEXT_CLICK)
 			if(bottomSheetFullLyricRecyclerView.visibility == View.VISIBLE) {
 				bottomSheetFullLyricRecyclerView.fadOutAnimation(LYRIC_FADE_TRANSITION_SEC)
+				bottomSheetFullLyricRecyclerView.visibility = View.GONE
 				bottomSheetFullTitle.setTextAnimation(instance?.currentMediaItem?.mediaMetadata?.title, skipAnimation = true)
 				bottomSheetFullSubtitle.setTextAnimation(instance?.currentMediaItem?.mediaMetadata?.artist, skipAnimation = true )
 			} else {
-				bottomSheetFullLyricRecyclerView.visibility = View.VISIBLE
 				bottomSheetFullLyricRecyclerView.fadInAnimation(LYRIC_FADE_TRANSITION_SEC)
+				bottomSheetFullLyricRecyclerView.visibility = View.VISIBLE
 				bottomSheetFullTitle.setTextAnimation(null)
 				bottomSheetFullSubtitle.setTextAnimation(null)
 			}
@@ -598,7 +599,6 @@ class FullBottomSheet(context: Context, attrs: AttributeSet?, defStyleAttr: Int,
 				context,
 				options
 			).apply {
-				// TODO does https://stackoverflow.com/a/58004553 describe this or another bug? will google ever fix anything?
 				resources.configuration.uiMode = context.resources.configuration.uiMode
 			}
 
