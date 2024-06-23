@@ -228,7 +228,7 @@ class PlayerBottomSheet private constructor(
                         fullPlayer.bottomSheetFullLyricRecyclerView.fadOutAnimation(FullBottomSheet.LYRIC_FADE_TRANSITION_SEC)
                         fullPlayer.bottomSheetLyricButton.isChecked = false
                         fullPlayer.bottomSheetFullTitle.setTextAnimation(instance?.currentMediaItem?.mediaMetadata?.title, skipAnimation = true)
-                        fullPlayer.bottomSheetFullSubtitle.setTextAnimation(instance?.currentMediaItem?.mediaMetadata?.artist, skipAnimation = true)
+                        fullPlayer.bottomSheetFullSubtitle.setTextAnimation(instance?.currentMediaItem?.mediaMetadata?.artist?: context.getString(R.string.unknown_artist), skipAnimation = true)
                     } else {
                         standardBottomSheetBehavior!!.handleBackInvoked()
                     }
