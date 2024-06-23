@@ -51,7 +51,6 @@ class GramophoneApplication : Application(), SingletonImageLoader.Factory {
         val prefs = PreferenceManager.getDefaultSharedPreferences(this)
 
 
-        // https://github.com/androidx/media/issues/805
         if (needsMissingOnDestroyCallWorkarounds()) {
             val nm = getSystemService(NOTIFICATION_SERVICE) as NotificationManager
             nm.cancel(DefaultMediaNotificationProvider.DEFAULT_NOTIFICATION_ID)

@@ -646,7 +646,6 @@ object MediaStoreUtils {
             }
         }
         playlistsFinal.add(RecentlyAdded(
-            // TODO setting?
             (System.currentTimeMillis() / 1000) - (2 * 7 * 24 * 60 * 60),
             recentlyAddedMap
         ))

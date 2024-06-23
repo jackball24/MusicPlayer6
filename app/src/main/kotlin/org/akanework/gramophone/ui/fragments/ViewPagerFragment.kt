@@ -35,7 +35,7 @@ import org.akanework.gramophone.ui.fragments.settings.MainSettingsFragment
  *   A fragment that's in charge of displaying tabs
  * and is connected to the drawer.
  *
- * @author AkaneTan
+ * @author 时空L0k1
  */
 @androidx.annotation.OptIn(UnstableApi::class)
 class ViewPagerFragment : BaseFragment(true) {
