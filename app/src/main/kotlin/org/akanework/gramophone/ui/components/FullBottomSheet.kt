@@ -131,7 +131,9 @@ class FullBottomSheet(context: Context, attrs: AttributeSet?, defStyleAttr: Int,
 		const val FOREGROUND_COLOR_TRANSITION_SEC: Long = 150
 		const val LYRIC_FADE_TRANSITION_SEC: Long = 125
 	}
-
+/*
+@au
+ */
 	private val touchListener = object : SeekBar.OnSeekBarChangeListener, Slider.OnSliderTouchListener {
 		override fun onProgressChanged(seekBar: SeekBar?, progress: Int, fromUser: Boolean) {
 			if (fromUser) {
