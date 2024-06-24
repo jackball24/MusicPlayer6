@@ -1,13 +1,18 @@
 package org.akanework.gramophone.ui.adapters
 
+import android.app.AlertDialog
 import android.content.Context
+import android.media.MediaMetadata
+import android.text.InputType
 import android.view.MenuItem
 import android.view.View
 import android.view.ViewGroup
+import android.widget.EditText
 import android.widget.TextView
 import androidx.appcompat.widget.PopupMenu
 import androidx.core.content.edit
 import androidx.media3.common.C
+import androidx.media3.common.MediaItem
 import androidx.media3.common.Player.REPEAT_MODE_OFF
 import androidx.preference.PreferenceManager
 import androidx.recyclerview.widget.LinearSmoothScroller
@@ -154,6 +159,7 @@ open class BaseDecorAdapter<T : BaseAdapter<*>>(
                 }
             }
         }
+
         holder.shuffleAll.setOnClickListener {
             if (adapter is SongAdapter) {
                 val list = adapter.getSongList()
@@ -175,7 +181,48 @@ open class BaseDecorAdapter<T : BaseAdapter<*>>(
         holder.jumpDown.setOnClickListener {
             scrollToViewPosition(jumpDownPos!!)
         }
+
+        // 添加 playlistAdd 按钮点击事件
+        holder.playlistAdd.setOnClickListener {
+            showAddPlaylistDialog()
+        }
     }
+    private fun showAddPlaylistDialog() {
+        val builder = AlertDialog.Builder(activity)
+        builder.setTitle("新建播放列表")
+
+        val input = EditText(activity)
+        input.inputType = InputType.TYPE_CLASS_TEXT
+        builder.setView(input)
+
+        builder.setPositiveButton("完成") { dialog, which ->
+            val listName = input.text.toString()
+            if (listName.isNotBlank()) {
+                addNewPlaylist(listName)
+            }
+        }
+        builder.setNegativeButton("取消") { dialog, which ->
+            dialog.cancel()
+        }
+
+        builder.show()
+    }
+    private fun addNewPlaylist(listName: String) {
+        // 创建一个新的 MediaItem 或其他列表项
+        val newMediaItem = MediaItem.Builder()
+            .setMediaId(listName)
+            .setMediaMetadata(MediaMetadata.Builder().setTitle(listName).build())
+            .build()
+
+        // 添加到适配器的数据集中
+        playlist.second.add(newMediaItem)
+        playlist.first.add(playlist.second.size - 1)
+
+        // 通知适配器数据集已更改
+        notifyItemInserted(playlist.second.size - 1)
+    }
+
+
 
     override fun onAttachedToRecyclerView(recyclerView: MyRecyclerView) {
         super.onAttachedToRecyclerView(recyclerView)
@@ -227,6 +274,7 @@ open class BaseDecorAdapter<T : BaseAdapter<*>>(
     ) : RecyclerView.ViewHolder(view) {
         val sortButton: MaterialButton = view.findViewById(R.id.sort)
         val playAll: MaterialButton = view.findViewById(R.id.play_all)
+        val playlistAdd: MaterialButton = view.findViewById(R.id.playlist_add)
         val shuffleAll: MaterialButton = view.findViewById(R.id.shuffle_all)
         val jumpUp: MaterialButton = view.findViewById(R.id.jumpUp)
         val jumpDown: MaterialButton = view.findViewById(R.id.jumpDown)
