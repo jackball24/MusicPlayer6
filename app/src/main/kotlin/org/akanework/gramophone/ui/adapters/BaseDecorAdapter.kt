@@ -11,6 +11,7 @@ import androidx.media3.common.C
 import androidx.media3.common.Player.REPEAT_MODE_OFF
 import androidx.preference.PreferenceManager
 import androidx.recyclerview.widget.LinearSmoothScroller
+import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.button.MaterialButton
 import org.akanework.gramophone.R
@@ -42,6 +43,8 @@ open class BaseDecorAdapter<T : BaseAdapter<*>>(
 
     final override fun onBindViewHolder(holder: ViewHolder, position: Int) {
         val count = adapter.itemCount
+        holder.addtoList.visibility=
+            if(adapter is PlaylistAdapter) View.VISIBLE else View.GONE
         holder.playAll.visibility =
             if (adapter is SongAdapter) View.VISIBLE else View.GONE
         holder.shuffleAll.visibility =
@@ -231,6 +234,7 @@ open class BaseDecorAdapter<T : BaseAdapter<*>>(
         val jumpUp: MaterialButton = view.findViewById(R.id.jumpUp)
         val jumpDown: MaterialButton = view.findViewById(R.id.jumpDown)
         val counter: TextView = view.findViewById(R.id.song_counter)
+        val addtoList: MaterialButton = view.findViewById(R.id.playlist_add)
     }
 
     fun updateSongCounter() {
