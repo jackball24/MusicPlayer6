@@ -666,7 +666,6 @@ object MediaStoreUtils {
         }
         //添加最近添加的歌曲列表
         playlistsFinal.add(RecentlyAdded(
-            // TODO setting?
             (System.currentTimeMillis() / 1000) - (2 * 7 * 24 * 60 * 60),
             recentlyAddedMap
         ))

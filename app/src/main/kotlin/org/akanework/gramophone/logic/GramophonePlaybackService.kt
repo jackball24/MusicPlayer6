@@ -120,12 +120,16 @@ class GramophonePlaybackService : MediaLibraryService(), MediaSessionService.Lis
             customCommands[1]
         else
             customCommands[0]
-
+/*
+* 可单独在线程中执行的任务
+* */
     private val timer: Runnable = Runnable {
         controller!!.pause()
         timerDuration = null
     }
-
+/*
+*计时器的持续时间，延迟执行
+* */
     private var timerDuration: Long? = null
         set(value) {
             field = value
@@ -230,8 +234,7 @@ class GramophonePlaybackService : MediaLibraryService(), MediaSessionService.Lis
                     )
                     .setExtensionRendererMode(DefaultRenderersFactory.EXTENSION_RENDERER_MODE_PREFER),
                 GramophoneMediaSourceFactory(this)
-                /* .setMp3ExtractorFlags(Mp3Extractor.FLAG_ENABLE_INDEX_SEEKING))
-            TODO flag breaks playback of AcousticGuitar.mp3, report exo bug + add UI toggle*/
+                /* .setMp3ExtractorFlags(Mp3Extractor.FLAG_ENABLE_INDEX_SEEKING))*/
             )
                 .setWakeMode(C.WAKE_MODE_LOCAL)
                 .setSkipSilenceEnabled(prefs.getBooleanStrict("skip_silence", false))
@@ -318,6 +321,9 @@ class GramophonePlaybackService : MediaLibraryService(), MediaSessionService.Lis
                 )
                 .build()
         controller = MediaController.Builder(this, mediaSession!!.token).buildAsync().get()
+        /*
+        将mediaSession添加到消息队列末尾，在主线程执行
+        * */
         handler.post {
             if (mediaSession == null) return@post
             lastPlayedManager.restore { items, factory ->
@@ -350,6 +356,7 @@ class GramophonePlaybackService : MediaLibraryService(), MediaSessionService.Lis
 
     // When destroying, we should release server side player
     // alongside with the mediaSession.
+    //释放所有的资源
     override fun onDestroy() {
         // Important: this must happen before sending stop() as that changes state ENDED -> IDLE
         lastPlayedManager.save()
@@ -485,7 +492,9 @@ class GramophonePlaybackService : MediaLibraryService(), MediaSessionService.Lis
         }
         return settable
     }
-
+/*
+* 歌词的获取采用协程
+* */
     override fun onTracksChanged(tracks: Tracks) {
         val mediaItem = controller!!.currentMediaItem
         lyricsLock.runInBg {
@@ -505,6 +514,7 @@ class GramophonePlaybackService : MediaLibraryService(), MediaSessionService.Lis
                     }
                 }
             }
+            //协程执行，挂起函数，不阻塞线程，生命周期为viewmodel
             CoroutineScope(Dispatchers.Main).launch {
                 mediaSession?.let {
                     lyrics = lrc

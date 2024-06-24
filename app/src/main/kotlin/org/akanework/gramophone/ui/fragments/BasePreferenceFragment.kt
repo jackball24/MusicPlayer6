@@ -19,7 +19,7 @@ import org.akanework.gramophone.logic.enableEdgeToEdgePaddingListener
  *   A base fragment for all SettingsTopFragment. It
  * is used to make overlapping color easier.
  *
- * @author AkaneTan
+ * @author grizzly03
  */
 abstract class BasePreferenceFragment : PreferenceFragmentCompat(),
     SharedPreferences.OnSharedPreferenceChangeListener {

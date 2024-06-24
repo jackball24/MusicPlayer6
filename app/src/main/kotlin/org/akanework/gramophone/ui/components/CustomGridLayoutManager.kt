@@ -8,7 +8,7 @@ import androidx.recyclerview.widget.GridLayoutManager
  *   A grid layout manager for making the grid view
  * intact.
  *
- * @author AkaneTan
+ * @author 时空L0k1
  */
 class CustomGridLayoutManager(
     context: Context,

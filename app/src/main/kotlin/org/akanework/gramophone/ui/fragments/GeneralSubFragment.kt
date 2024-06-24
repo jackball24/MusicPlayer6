@@ -21,10 +21,10 @@ import org.akanework.gramophone.ui.adapters.Sorter
 /**
  * GeneralSubFragment:
  *   Inherited from [BaseFragment]. Sub fragment of all
- * possible item types. TODO: Artist / AlbumArtist
+ * possible item types.
  *
  * @see BaseFragment
- * @author AkaneTan, nift4
+ * @author 时空L0k1,grizzly03
  */
 @androidx.annotation.OptIn(UnstableApi::class)
 class GeneralSubFragment : BaseFragment(true) {
@@ -46,7 +46,6 @@ class GeneralSubFragment : BaseFragment(true) {
         appBarLayout.enableEdgeToEdgePaddingListener()
 
         if (libraryViewModel.albumItemList.value == null) {
-            // TODO make it wait for lib load instead of breaking state restore
             // (still better than crashing, though)
             requireActivity().supportFragmentManager.popBackStack()
             return null

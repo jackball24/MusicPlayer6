@@ -120,7 +120,6 @@ internal class RecyclerViewHelper(
 		return itemHeightHelper?.getItemHeightFromZeroTo(to) ?: (itemHeight * to)
 	}
 
-	// https://github.com/zhanghai/AndroidFastScroll/issues/11#issuecomment-922413668
 	private fun getPopupTextPosition(): Int {
 		val position = firstItemAdapterPosition
 		if (position == RecyclerView.NO_POSITION) return RecyclerView.NO_POSITION
