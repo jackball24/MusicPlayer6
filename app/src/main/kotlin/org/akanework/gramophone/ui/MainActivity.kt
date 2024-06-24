@@ -43,8 +43,6 @@ import org.akanework.gramophone.ui.fragments.BaseFragment
  * MainActivity:
  *   Core of gramophone, one and the only activity
  * used across the application.
- *
- * @author 时空L0k1,grizzly03
  */
 class MainActivity : AppCompatActivity() {
 
@@ -183,6 +181,7 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
+    // https://twitter.com/Piwai/status/1529510076196630528
     override fun reportFullyDrawn() {
         handler.removeCallbacks(reportFullyDrawnRunnable)
         if (ready) throw IllegalStateException("ready is already true")
@@ -218,6 +217,7 @@ class MainActivity : AppCompatActivity() {
                 updateLibrary()
             } else {
                 reportFullyDrawn()
+                // TODO: Show a prompt here
             }
         }
     }
@@ -240,6 +240,7 @@ class MainActivity : AppCompatActivity() {
 
     @OptIn(UnstableApi::class)
     override fun onDestroy() {
+        // https://github.com/androidx/media/issues/805
         if (needsMissingOnDestroyCallWorkarounds()
             && (getPlayer()?.playWhenReady != true || getPlayer()?.mediaItemCount == 0)) {
             val nm = getSystemService(NOTIFICATION_SERVICE) as NotificationManager

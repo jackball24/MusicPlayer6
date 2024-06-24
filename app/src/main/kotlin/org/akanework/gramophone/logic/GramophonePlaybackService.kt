@@ -498,6 +498,7 @@ class GramophonePlaybackService : MediaLibraryService(), MediaSessionService.Lis
     override fun onTracksChanged(tracks: Tracks) {
         val mediaItem = controller!!.currentMediaItem
         lyricsLock.runInBg {
+            //偏好设置（prefs） 是否修剪歌词  是否多行显示
             val trim = prefs.getBoolean("trim_lyrics", false)
             val multiLine = prefs.getBoolean("lyric_multiline", false)
             var lrc = loadAndParseLyricsFile(mediaItem?.getFile(), trim, multiLine)

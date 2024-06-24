@@ -1129,11 +1129,14 @@ class FullBottomSheet(context: Context, attrs: AttributeSet?, defStyleAttr: Int,
 			if (currentFocusPos == position) return
 			if (position >= 0) {
 				currentFocusPos.let {
+					// 通知适配器更新前一个高亮歌词项的视图（取消高亮）
 					notifyItemChanged(it)
+					// 更新当前高亮歌词的位置
 					currentFocusPos = position
+					// 通知适配器更新当前高亮歌词项的视图
 					notifyItemChanged(currentFocusPos)
 				}
-
+				//更新翻译歌词项
 				if (position + 1 < lyricList.size &&
 					lyricList[position + 1].isTranslation
 				) {
@@ -1302,11 +1305,11 @@ class FullBottomSheet(context: Context, attrs: AttributeSet?, defStyleAttr: Int,
 	fun updateLyric(duration: Long?) {
 		if (bottomSheetFullLyricList.isNotEmpty()) {
 			val newIndex: Int
-
+			//过滤和查找当前播放位置的歌词索引：
 			val filteredList = bottomSheetFullLyricList.filterIndexed { _, lyric ->
 				(lyric.timeStamp ?: 0) <= (instance?.currentPosition ?: 0)
 			}
-
+			//确定要滚动到的新歌词索引：
 			newIndex = if (filteredList.isNotEmpty()) {
 				filteredList.indices.maxBy {
 					(filteredList[it].timeStamp ?: 0)
@@ -1314,7 +1317,7 @@ class FullBottomSheet(context: Context, attrs: AttributeSet?, defStyleAttr: Int,
 			} else {
 				-1
 			}
-
+			//执行滚动和更新高亮
 			if (newIndex != -1 &&
 				duration != null &&
 				newIndex != bottomSheetFullLyricAdapter.currentFocusPos
@@ -1359,9 +1362,11 @@ class FullBottomSheet(context: Context, attrs: AttributeSet?, defStyleAttr: Int,
 	private val positionRunnable = object : Runnable {
 		override fun run() {
 			if (!runnableRunning) return
+			//获取当前播放位置和时长
 			val position =
 				CalculationUtils.convertDurationToTimeStamp(instance?.currentPosition ?: 0)
 			val duration = instance?.currentMediaItem?.mediaMetadata?.extras?.getLong("Duration")
+			//更新界面元素
 			if (duration != null && !isUserTracking) {
 				bottomSheetFullSeekBar.max = duration.toInt()
 				bottomSheetFullSeekBar.progress = instance?.currentPosition?.toInt() ?: 0
@@ -1370,7 +1375,9 @@ class FullBottomSheet(context: Context, attrs: AttributeSet?, defStyleAttr: Int,
 					min(instance?.currentPosition?.toFloat() ?: 0f, bottomSheetFullSlider.valueTo)
 				bottomSheetFullPosition.text = position
 			}
+			//更新歌词显示
 			updateLyric(duration)
+			//定时
 			if (instance?.isPlaying == true) {
 				handler.postDelayed(this, SLIDER_UPDATE_INTERVAL)
 			} else {
