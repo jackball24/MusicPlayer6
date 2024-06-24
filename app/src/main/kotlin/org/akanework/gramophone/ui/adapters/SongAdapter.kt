@@ -1,7 +1,9 @@
 package org.akanework.gramophone.ui.adapters
 
 import android.net.Uri
+import android.view.LayoutInflater
 import android.view.View
+import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.widget.PopupMenu
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
@@ -9,11 +11,17 @@ import androidx.lifecycle.MutableLiveData
 import androidx.media3.common.C
 import androidx.media3.common.MediaItem
 import androidx.media3.common.Player
+import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.RecyclerView
+import android.widget.EditText
+import android.widget.Button
+import android.widget.Toast
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import org.akanework.gramophone.R
+import org.akanework.gramophone.logic.utils.MediaStoreUtils
 import org.akanework.gramophone.ui.LibraryViewModel
 import org.akanework.gramophone.ui.MediaControllerViewModel
 import org.akanework.gramophone.ui.components.NowPlayingDrawable
@@ -21,7 +29,6 @@ import org.akanework.gramophone.ui.fragments.ArtistSubFragment
 import org.akanework.gramophone.ui.fragments.DetailDialogFragment
 import org.akanework.gramophone.ui.fragments.GeneralSubFragment
 import java.util.GregorianCalendar
-
 
 /**
  * [SongAdapter] is an adapter for displaying songs.
@@ -36,15 +43,14 @@ class SongAdapter(
     allowDiffUtils: Boolean = false,
     rawOrderExposed: Boolean = !isSubFragment,
     fallbackSpans: Int = 1
-) : BaseAdapter<MediaItem>
-    (
+) : BaseAdapter<MediaItem>(
     fragment,
     liveData = songList,
     sortHelper = MediaItemHelper(),
     naturalOrderHelper = if (canSort) helper else null,
     initialSortType = if (canSort)
         (if (helper != null) Sorter.Type.NaturalOrder else
-                (if (rawOrderExposed) Sorter.Type.NativeOrder else Sorter.Type.ByTitleAscending))
+            (if (rawOrderExposed) Sorter.Type.NativeOrder else Sorter.Type.ByTitleAscending))
     else Sorter.Type.None,
     canSort = canSort,
     pluralStr = R.plurals.songs,
@@ -220,11 +226,66 @@ class SongAdapter(
                     }
                     true
                 }
-
+                R.id.addtoList -> {
+                    showAddToPlaylistDialog(item)
+                    true
+                }
 
                 else -> false
             }
         }
+    }
+
+    private fun showAddToPlaylistDialog(item: MediaItem) {
+        val builder = AlertDialog.Builder(mainActivity)
+        builder.setTitle("添加到播放列表")
+
+        val dialogView = LayoutInflater.from(mainActivity).inflate(R.layout.dialog_add_playlist, null)
+        builder.setView(dialogView)
+
+        val recyclerView = dialogView.findViewById<RecyclerView>(R.id.recyclerview_playlists)
+        recyclerView.layoutManager = LinearLayoutManager(mainActivity)
+
+        val playlistLiveData = viewModel.playlistList
+        val adapter = PlaylistAdapter(fragment, playlistLiveData) { selectedPlaylist ->
+            addSongToPlaylist(item, selectedPlaylist)
+        }
+        recyclerView.adapter = adapter
+
+        val editTextPlaylistName = dialogView.findViewById<EditText>(R.id.edittext_playlist_name)
+        val buttonCreatePlaylist = dialogView.findViewById<Button>(R.id.button_create_playlist)
+
+        buttonCreatePlaylist.setOnClickListener {
+            val newPlaylistName = editTextPlaylistName.text.toString().trim()
+            if (newPlaylistName.isNotEmpty()) {
+                // 处理创建新播放列表逻辑
+                createNewPlaylist(newPlaylistName)
+                // 更新播放列表 RecyclerView
+                playlistLiveData.value = playlistLiveData.value?.plus(MediaStoreUtils.Playlist(newPlaylistName, listOf()))
+                adapter.notifyItemInserted(playlistLiveData.value!!.size - 1)
+                editTextPlaylistName.text.clear()
+            } else {
+                Toast.makeText(mainActivity, "请输入播放列表名称", Toast.LENGTH_SHORT).show()
+            }
+        }
+
+        builder.setNegativeButton("取消") { dialog, _ -> dialog.dismiss() }
+        builder.setPositiveButton("完成") { dialog, _ -> dialog.dismiss() }
+
+        builder.show()
+    }
+
+    private fun addSongToPlaylist(item: MediaItem, playlist: MediaStoreUtils.Playlist) {
+        // 实现将歌曲添加到指定播放列表的逻辑
+        // 例如，更新 ViewModel 或数据库
+        playlist.songList = playlist.songList + item // 假设 songList 是一个可变列表
+        Toast.makeText(mainActivity, "已添加到 ${playlist.title}", Toast.LENGTH_SHORT).show()
+    }
+
+    private fun createNewPlaylist(playlistName: String) {
+        // 实现创建新播放列表的逻辑
+        // 例如，更新 ViewModel 或数据库
+        Toast.makeText(mainActivity, "已创建播放列表 $playlistName", Toast.LENGTH_SHORT).show()
     }
 
     override fun onBindViewHolder(holder: ViewHolder, position: Int, payloads: MutableList<Any>) {

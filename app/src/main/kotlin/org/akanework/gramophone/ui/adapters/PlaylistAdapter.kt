@@ -13,8 +13,8 @@ import org.akanework.gramophone.ui.fragments.GeneralSubFragment
 class PlaylistAdapter(
     fragment: Fragment,
     playlistList: MutableLiveData<List<MediaStoreUtils.Playlist>>,
-) : BaseAdapter<MediaStoreUtils.Playlist>
-    (
+    private val onPlaylistSelected: ((MediaStoreUtils.Playlist) -> Unit)? = null
+) : BaseAdapter<MediaStoreUtils.Playlist>(
     fragment,
     liveData = playlistList,
     sortHelper = StoreItemHelper(),
@@ -35,9 +35,11 @@ class PlaylistAdapter(
     }
 
     override fun onClick(item: MediaStoreUtils.Playlist) {
-        mainActivity.startFragment(GeneralSubFragment()) {
-            putInt("Position", toRawPos(item))
-            putInt("Item", R.id.playlist)
+        onPlaylistSelected?.invoke(item) ?: run {
+            mainActivity.startFragment(GeneralSubFragment()) {
+                putInt("Position", toRawPos(item))
+                putInt("Item", R.id.playlist)
+            }
         }
     }
 
