@@ -49,6 +49,7 @@
     <string name="go_to_album">Go to album</string>
     <string name="go_to_artist">Go to artist</string>
     <string name="details">Details</string>
+    <string name="add_to_list">Add to list</string>
     <string name="shuffle">Shuffle</string>
     <string name="repeat_mode">Repeat mode</string>
     <string name="unknown_playlist">Unknown playlist</string>
