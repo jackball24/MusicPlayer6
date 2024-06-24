@@ -137,7 +137,7 @@ class FullBottomSheet(context: Context, attrs: AttributeSet?, defStyleAttr: Int,
 	private val touchListener = object : SeekBar.OnSeekBarChangeListener, Slider.OnSliderTouchListener {
 		override fun onProgressChanged(seekBar: SeekBar?, progress: Int, fromUser: Boolean) {
 			if (fromUser) {
-				val dest = instance?.currentMediaItem?.mediaMetadata?.extras?.getLong("Duration")
+				val dest = instance?.currentMediaItem?.mediaMetadata?.extras?.getLong("Duration")//获取长度
 				if (dest != null) {
 					bottomSheetFullPosition.text =
 						CalculationUtils.convertDurationToTimeStamp((progress.toLong()))
@@ -154,8 +154,8 @@ class FullBottomSheet(context: Context, attrs: AttributeSet?, defStyleAttr: Int,
 			val mediaId = instance?.currentMediaItem?.mediaId
 			if (mediaId != null) {
 				if (seekBar != null) {
-					instance?.seekTo((seekBar.progress.toLong()))
-					updateLyric(seekBar.progress.toLong())
+					instance?.seekTo((seekBar.progress.toLong()))//跳转到相应位置
+					updateLyric(seekBar.progress.toLong())//歌词的同步
 				}
 			}
 			isUserTracking = false

@@ -114,7 +114,7 @@ object MediaStoreUtils {
         override val id: Long,
         override val title: String?,
         override val songList: MutableList<MediaItem>
-    ) : Item
+    ) : Item//初始化定义
 
     @Parcelize
     data class Lyric(
@@ -277,7 +277,7 @@ object MediaStoreUtils {
         val coverUri = Uri.parse("content://media/external/audio/albumart")
         val folderFilter = prefs.getStringSet("folderFilter", setOf()) ?: setOf()
 
-        // Initialize list and maps.
+        // Initialize list and maps.//初始化列表
         val coverCache = if (haveImgPerm) hashMapOf<Long, Pair<File, FileNode>>() else null
         val folders = hashSetOf<String>()
         val folderArray = mutableListOf<String>()

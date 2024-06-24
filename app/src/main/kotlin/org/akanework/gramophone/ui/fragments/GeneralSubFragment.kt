@@ -72,7 +72,7 @@ class GeneralSubFragment : BaseFragment(true) {
             }
 
 
-            R.id.playlist -> {
+            R.id.playlist -> {//如果类型是播放列表
                 // Playlists
                 val item = libraryViewModel.playlistList.value!![position]
                 title = if (item is MediaStoreUtils.RecentlyAdded) {
@@ -80,7 +80,7 @@ class GeneralSubFragment : BaseFragment(true) {
                 } else {
                     item.title ?: requireContext().getString(R.string.unknown_playlist)
                 }
-                itemList = item.songList
+                itemList = item.songList//调用MediaStoreUtils,初始化songList
                 helper = Sorter.NaturalOrderHelper { itemList.indexOf(it) }
             }
 
