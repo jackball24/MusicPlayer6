@@ -46,6 +46,7 @@
     <string name="go_to_album">アルバムを開く</string>
     <string name="go_to_artist">アーティストを開く</string>
     <string name="details">詳細</string>
+    <string name="add_to_list">プレイリストに追加</string>
     <string name="shuffle">シャッフル</string>
     <string name="repeat_mode">リピートモード</string>
     <string name="album_artist">アルバムのアーティスト</string>

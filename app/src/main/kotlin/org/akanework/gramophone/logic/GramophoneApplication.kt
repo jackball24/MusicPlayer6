@@ -36,9 +36,10 @@ class GramophoneApplication : Application(), SingletonImageLoader.Factory {
         private const val TAG = "GramophoneApplication"
     }
 
+    // Application创建时调用
     @OptIn(UnstableApi::class)
     override fun onCreate() {
-        // Set up BugHandlerActivity.
+        // 设置BugHandlerActivity来处理未捕获的异常
         Thread.setDefaultUncaughtExceptionHandler { _, paramThrowable ->
             val exceptionMessage = Log.getStackTraceString(paramThrowable)
             val threadName = Thread.currentThread().name
@@ -47,17 +48,16 @@ class GramophoneApplication : Application(), SingletonImageLoader.Factory {
             exitProcess(10)
         }
         super.onCreate()
-        // Cheat by loading preferences before setting up StrictMode.
+        // 在设置StrictMode之前加载首选项
         val prefs = PreferenceManager.getDefaultSharedPreferences(this)
 
-
-        // https://github.com/androidx/media/issues/805
+        // 如果需要缺少OnDestroy调用的解决方法，取消默认通知ID的通知
         if (needsMissingOnDestroyCallWorkarounds()) {
             val nm = getSystemService(NOTIFICATION_SERVICE) as NotificationManager
             nm.cancel(DefaultMediaNotificationProvider.DEFAULT_NOTIFICATION_ID)
         }
 
-        // Set application theme when launching.
+        // 应用启动时设置应用主题
         when (prefs.getStringStrict("theme_mode", "0")) {
             "0" -> {
                 AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_FOLLOW_SYSTEM)
@@ -73,11 +73,13 @@ class GramophoneApplication : Application(), SingletonImageLoader.Factory {
         }
     }
 
+    // 创建新的ImageLoader
     @kotlin.OptIn(ExperimentalCoilApi::class)
     override fun newImageLoader(context: PlatformContext): ImageLoader {
         return ImageLoader.Builder(context)
             .diskCache(null)
             .components {
+                // 如果支持ScopedStorageV1，则添加自定义的Fetcher
                 if (hasScopedStorageV1()) {
                     add(Fetcher.Factory { data, options, _ ->
                         if (data !is Pair<*, *>) return@Factory null
@@ -87,15 +89,15 @@ class GramophoneApplication : Application(), SingletonImageLoader.Factory {
                         return@Factory Fetcher {
                             ImageFetchResult(
                                 ThumbnailUtils.createAudioThumbnail(file, options.size.let {
-                                        Size(it.width.pxOrElse { size?.width ?: 10000 },
-                                            it.height.pxOrElse { size?.height ?: 10000 })
-                                    }, null).asCoilImage(), true, DataSource.DISK)
+                                    Size(it.width.pxOrElse { size?.width ?: 10000 },
+                                        it.height.pxOrElse { size?.height ?: 10000 })
+                                }, null).asCoilImage(), true, DataSource.DISK)
                         }
                     })
                 }
             }
             .run {
-
+                // 设置日志记录器
                 logger(object : Logger {
                     override var minLevel = Logger.Level.Verbose
                     override fun log(
@@ -105,11 +107,11 @@ class GramophoneApplication : Application(), SingletonImageLoader.Factory {
                         throwable: Throwable?
                     ) {
                         if (level < minLevel) return
-                        val priority = level.ordinal + 2 // obviously the best way to do it
+                        val priority = level.ordinal + 2 // 根据日志级别设置优先级
                         if (message != null) {
                             Log.println(priority, tag, message)
                         }
-                        // Let's keep the log readable and ignore normal events' stack traces.
+                        // 保持日志可读，忽略正常事件的堆栈跟踪
                         if (throwable != null && throwable !is NullRequestDataException
                             && (throwable !is IOException
                                     || throwable.message != "No album art found")) {
@@ -121,3 +123,4 @@ class GramophoneApplication : Application(), SingletonImageLoader.Factory {
             .build()
     }
 }
+

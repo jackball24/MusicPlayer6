@@ -31,6 +31,7 @@
     <string name="go_to_album">專輯..</string>
     <string name="go_to_artist">藝術家..</string>
     <string name="details">詳細</string>
+    <string name="add_to_list">添加到歌單</string>
     <string name="shuffle">隨機</string>
     <string name="repeat_mode">循環模式</string>
     <string name="unknown_playlist">未知播放列表</string>

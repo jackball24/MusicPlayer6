@@ -49,43 +49,50 @@ import org.akanework.gramophone.logic.GramophonePlaybackService.Companion.SERVIC
 import org.akanework.gramophone.logic.utils.MediaStoreUtils
 import java.io.File
 
+// 播放或暂停播放
 fun Player.playOrPause() {
     if (isPlaying) {
-        pause()
+        pause() // 如果正在播放，则暂停
     } else {
-        play()
+        play() // 如果未播放，则开始播放
     }
 }
 
+// 获取MediaItem的URI
 fun MediaItem.getUri(): Uri? {
-    return localConfiguration?.uri
+    return localConfiguration?.uri // 返回本地配置的URI
 }
 
+// 获取MediaItem的文件
 fun MediaItem.getFile(): File? {
-    return getUri()?.toFile()
+    return getUri()?.toFile() // 将URI转换为文件并返回
 }
 
+// 关闭键盘
 fun Activity.closeKeyboard(view: View) {
     if (ViewCompat.getRootWindowInsets(window.decorView)?.isVisible(WindowInsetsCompat.Type.ime()) == true) {
-        WindowInsetsControllerCompat(window, view).hide(WindowInsetsCompat.Type.ime())
+        WindowInsetsControllerCompat(window, view).hide(WindowInsetsCompat.Type.ime()) // 隐藏键盘
     }
 }
 
+// 显示键盘
 fun Activity.showKeyboard(view: View) {
     view.requestFocus()
     if (ViewCompat.getRootWindowInsets(window.decorView)?.isVisible(WindowInsetsCompat.Type.ime()) == false) {
-        WindowInsetsControllerCompat(window, view).show(WindowInsetsCompat.Type.ime())
+        WindowInsetsControllerCompat(window, view).show(WindowInsetsCompat.Type.ime()) // 显示键盘
     }
 }
 
+// 启动动画
 fun Drawable.startAnimation() {
     when (this) {
-        is AnimatedVectorDrawable -> start()
-        is AnimatedVectorDrawableCompat -> start()
+        is AnimatedVectorDrawable -> start() // 启动AnimatedVectorDrawable动画
+        is AnimatedVectorDrawableCompat -> start() // 启动AnimatedVectorDrawableCompat动画
         else -> throw IllegalArgumentException()
     }
 }
 
+// 设置TextView文本并添加动画效果
 fun TextView.setTextAnimation(
     text: CharSequence?,
     duration: Long = 300,
@@ -93,11 +100,11 @@ fun TextView.setTextAnimation(
     skipAnimation: Boolean = false
 ) {
     if (skipAnimation) {
-        this.text = text
+        this.text = text // 跳过动画直接设置文本
         completion?.let { it() }
     } else if (this.text != text) {
         fadOutAnimation(duration) {
-            this.text = text
+            this.text = text // 先淡出动画，再设置文本，最后淡入动画
             fadInAnimation(duration) {
                 completion?.let {
                     it()
@@ -109,8 +116,7 @@ fun TextView.setTextAnimation(
     }
 }
 
-// ViewExtensions
-
+// View扩展函数：淡出动画
 fun View.fadOutAnimation(
     duration: Long = 300,
     visibility: Int = View.INVISIBLE,
@@ -120,16 +126,17 @@ fun View.fadOutAnimation(
         .alpha(0f)
         .setDuration(duration)
         .withEndAction {
-            this.visibility = visibility
+            this.visibility = visibility // 动画结束后设置可见性
             completion?.let {
                 it()
             }
         }
 }
 
+// View扩展函数：淡入动画
 fun View.fadInAnimation(duration: Long = 300, completion: (() -> Unit)? = null) {
     alpha = 0f
-    visibility = View.VISIBLE
+    visibility = View.VISIBLE // 先设置为不可见
     animate()
         .alpha(1f)
         .setDuration(duration)
@@ -140,10 +147,12 @@ fun View.fadInAnimation(duration: Long = 300, completion: (() -> Unit)? = null) 
         }
 }
 
+// 将dp转换为px
 @Suppress("NOTHING_TO_INLINE")
 inline fun Int.dpToPx(context: Context): Int =
     (this.toFloat() * context.resources.displayMetrics.density).toInt()
 
+// 获取MediaController的定时器
 fun MediaController.getTimer(): Int? =
     sendCustomCommand(
         SessionCommand(SERVICE_QUERY_TIMER, Bundle.EMPTY),
@@ -154,7 +163,10 @@ fun MediaController.getTimer(): Int? =
         else null
     }
 
+// 检查MediaController是否有定时器
 fun MediaController.hasTimer(): Boolean = getTimer() != null
+
+// 设置MediaController的定时器
 fun MediaController.setTimer(value: Int) {
     sendCustomCommand(
         SessionCommand(SERVICE_SET_TIMER, Bundle.EMPTY).apply {
@@ -163,6 +175,7 @@ fun MediaController.setTimer(value: Int) {
     )
 }
 
+// 如果不存在则放入键值对
 inline fun <reified T, reified U> HashMap<T, U>.putIfAbsentSupport(key: T, value: U) {
     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
         putIfAbsent(key, value)
@@ -173,6 +186,7 @@ inline fun <reified T, reified U> HashMap<T, U>.putIfAbsentSupport(key: T, value
     }
 }
 
+// 获取MediaController的歌词
 @Suppress("UNCHECKED_CAST")
 fun MediaController.getLyrics(): MutableList<MediaStoreUtils.Lyric>? =
     sendCustomCommand(
@@ -183,7 +197,7 @@ fun MediaController.getLyrics(): MutableList<MediaStoreUtils.Lyric>? =
                 as Array<MediaStoreUtils.Lyric>?)?.toMutableList()
     }
 
-// https://twitter.com/Piwai/status/1529510076196630528
+// 异步地在消息队列前面添加回调
 fun Handler.postAtFrontOfQueueAsync(callback: Runnable) {
     sendMessageAtFrontOfQueue(Message.obtain(this, callback).apply {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP_MR1) {
@@ -192,6 +206,7 @@ fun Handler.postAtFrontOfQueueAsync(callback: Runnable) {
     })
 }
 
+// 为View启用Edge to Edge的Padding监听器
 fun View.enableEdgeToEdgePaddingListener(ime: Boolean = false, top: Boolean = false,
                                          extra: ((Insets) -> Unit)? = null) {
     if (fitsSystemWindows) throw IllegalArgumentException("must have fitsSystemWindows disabled")
@@ -255,6 +270,7 @@ fun View.enableEdgeToEdgePaddingListener(ime: Boolean = false, top: Boolean = fa
     }
 }
 
+// 定义Margin数据类
 data class Margin(var left: Int, var top: Int, var right: Int, var bottom: Int) {
     companion object {
         @Suppress("NOTHING_TO_INLINE")
@@ -272,10 +288,12 @@ data class Margin(var left: Int, var top: Int, var right: Int, var bottom: Int) 
     }
 }
 
+// 获取Cursor列索引
 @Suppress("NOTHING_TO_INLINE")
 inline fun Cursor.getColumnIndexOrNull(columnName: String): Int? =
     getColumnIndex(columnName).let { if (it == -1) null else it }
 
+// 更新View的Margin
 fun View.updateMargin(
     block: Margin.() -> Unit
 ) {
@@ -288,7 +306,7 @@ fun View.updateMargin(
     }
 }
 
-// enableEdgeToEdge() without enforcing contrast, magic based on androidx EdgeToEdge.kt
+// 在ComponentActivity中启用Edge to Edge模式
 fun ComponentActivity.enableEdgeToEdgeProperly() {
     if ((resources.configuration.uiMode and Configuration.UI_MODE_NIGHT_MASK) ==
         Configuration.UI_MODE_NIGHT_YES) {
@@ -299,12 +317,13 @@ fun ComponentActivity.enableEdgeToEdgeProperly() {
     }
 }
 
+// 处理WindowInsets的未消费部分
 @SuppressLint("DiscouragedPrivateApi")
 private fun WindowInsets.unconsumeIfNeeded() {
     if (Build.VERSION.SDK_INT < Build.VERSION_CODES.M) {
-        // Api21Impl of getRootWindowInsets returns already-consumed WindowInsets with correct data
-        // Said consumed insets cannot be dispatched again because well, they are already consumed
-        // Workaround this using some reflection (Api23Impl+ are not affected so this is safe)
+        // Api21Impl的getRootWindowInsets返回已经消费的WindowInsets
+        // 已经消费的insets不能再次分发，因为它们已经被消费
+        // 使用反射工作来解决这个问题（Api23Impl+不受影响，所以这是安全的）
         val mSystemWindowInsetsConsumed = WindowInsets::class.java
             .getDeclaredField("mSystemWindowInsetsConsumed")
             .apply { isAccessible = true }
@@ -320,12 +339,13 @@ private fun WindowInsets.unconsumeIfNeeded() {
     }
 }
 
-// Pitfall: WindowInsetsCompat.Builder(insets) mutates the platform insets
+// 克隆WindowInsetsCompat
 fun WindowInsetsCompat.clone(): WindowInsetsCompat =
     WindowInsetsCompat.toWindowInsetsCompat(WindowInsets(toWindowInsets()).also {
         it.unconsumeIfNeeded()
     })
 
+// 在后台运行带有信号量的任务
 inline fun Semaphore.runInBg(crossinline runnable: suspend () -> Unit) {
     CoroutineScope(Dispatchers.Default).launch {
         acquire()
@@ -337,17 +357,17 @@ inline fun Semaphore.runInBg(crossinline runnable: suspend () -> Unit) {
     }
 }
 
-// the whole point of this function is to do literally nothing at all (but without impacting
-// performance) in release builds and ignore StrictMode violations in debug builds
+// 此函数的整个重点是在release构建中不影响性能的情况下不做任何事情，并忽略debug构建中的StrictMode违规
 inline fun <reified T> allowDiskAccessInStrictMode(relax: Boolean = false, doIt: () -> T): T {
-    return  doIt()
+    return doIt()
 }
 
+// 在SharedPreferences中使用allowDiskAccessInStrictMode
 inline fun <reified T> SharedPreferences.use(relax: Boolean = false, doIt: SharedPreferences.() -> T): T {
     return allowDiskAccessInStrictMode(relax) { doIt() }
 }
 
-// use below functions if accessing from UI thread only
+// 以下函数仅在UI线程中访问SharedPreferences时使用
 @Suppress("NOTHING_TO_INLINE")
 inline fun SharedPreferences.getStringStrict(key: String, defValue: String?): String? {
     return use { getString(key, defValue) }
@@ -368,43 +388,53 @@ inline fun SharedPreferences.getStringSetStrict(key: String, defValue: Set<Strin
     return use { getStringSet(key, defValue) }
 }
 
+// 检查上下文是否有图像权限（仅适用于Android TIRAMISU及以上版本）
 @RequiresApi(Build.VERSION_CODES.TIRAMISU)
 fun Context.hasImagePermission() =
     checkSelfPermission(android.Manifest.permission.READ_MEDIA_IMAGES) ==
             PackageManager.PERMISSION_GRANTED
 
+// 检查是否需要缺少OnDestroy调用的解决方法
 @Suppress("NOTHING_TO_INLINE")
 inline fun needsMissingOnDestroyCallWorkarounds(): Boolean =
     Build.VERSION.SDK_INT == Build.VERSION_CODES.UPSIDE_DOWN_CAKE
 
+// 检查是否改进了MediaStore
 @Suppress("NOTHING_TO_INLINE")
 inline fun hasImprovedMediaStore(): Boolean =
     Build.VERSION.SDK_INT >= Build.VERSION_CODES.R
 
+// 检查是否需要手动设置SnackBar的Inset
 @Suppress("NOTHING_TO_INLINE")
 inline fun needsManualSnackBarInset(): Boolean =
     Build.VERSION.SDK_INT <= Build.VERSION_CODES.P
 
+// 检查MediaStore中是否包含AlbumArtistId
 @Suppress("NOTHING_TO_INLINE")
 inline fun hasAlbumArtistIdInMediaStore(): Boolean =
     Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q
 
+// 检查是否有操作系统剪贴板对话框
 @Suppress("NOTHING_TO_INLINE")
 inline fun hasOsClipboardDialog(): Boolean =
     Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU
 
+// 检查是否启用了Scoped Storage V2
 @Suppress("NOTHING_TO_INLINE")
 inline fun hasScopedStorageV2(): Boolean =
     Build.VERSION.SDK_INT >= Build.VERSION_CODES.R
 
+// 检查是否启用了Scoped Storage V1
 @Suppress("NOTHING_TO_INLINE")
 inline fun hasScopedStorageV1(): Boolean =
     Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q
 
+// 检查是否启用了Scoped Storage，并且支持媒体类型
 @Suppress("NOTHING_TO_INLINE")
 inline fun hasScopedStorageWithMediaTypes(): Boolean =
     Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU
 
+// 检查是否可能抛出ForegroundServiceStartNotAllowed异常
 @Suppress("NOTHING_TO_INLINE")
 inline fun mayThrowForegroundServiceStartNotAllowed(): Boolean =
     Build.VERSION.SDK_INT >= Build.VERSION_CODES.S &&

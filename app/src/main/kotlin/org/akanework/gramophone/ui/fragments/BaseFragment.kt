@@ -15,7 +15,7 @@ import org.akanework.gramophone.ui.MainActivity
  * overlapping colors more convenient. It can also manage
  * whether to show up bottom's mini player or not.
  *
- * @author AkaneTan, nift4
+ * @author 时空L0k1,grizzly03
  * @see MainActivity
  */
 abstract class BaseFragment(val wantsPlayer: Boolean? = null) : Fragment() {
@@ -29,7 +29,6 @@ abstract class BaseFragment(val wantsPlayer: Boolean? = null) : Fragment() {
         reenterTransition = MaterialSharedAxis(MaterialSharedAxis.X, /* forward= */ false)
     }
 
-    // https://github.com/material-components/material-components-android/issues/1984#issuecomment-1089710991
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         // Overlap colors.

@@ -107,6 +107,7 @@ class GramophonePlaybackService : MediaLibraryService(), MediaSessionService.Lis
     private val lyricsLock = Semaphore(1)
     private lateinit var prefs: SharedPreferences
 
+    // 获取重复播放命令
     private fun getRepeatCommand() =
         when (controller!!.repeatMode) {
             Player.REPEAT_MODE_OFF -> customCommands[2]
@@ -115,17 +116,20 @@ class GramophonePlaybackService : MediaLibraryService(), MediaSessionService.Lis
             else -> throw IllegalArgumentException()
         }
 
+    // 获取随机播放命令
     private fun getShufflingCommand() =
         if (controller!!.shuffleModeEnabled)
             customCommands[1]
         else
             customCommands[0]
 
+    // 定时器任务，时间到暂停播放
     private val timer: Runnable = Runnable {
         controller!!.pause()
         timerDuration = null
     }
 
+    // 定时器持续时间设置
     private var timerDuration: Long? = null
         set(value) {
             field = value
@@ -140,6 +144,7 @@ class GramophonePlaybackService : MediaLibraryService(), MediaSessionService.Lis
             )
         }
 
+    // 监听耳机拔出事件
     private val headSetReceiver = object : BroadcastReceiver() {
         override fun onReceive(context: Context, intent: Intent) {
             if (intent.action.equals(AudioManager.ACTION_AUDIO_BECOMING_NOISY)) {
@@ -148,6 +153,7 @@ class GramophonePlaybackService : MediaLibraryService(), MediaSessionService.Lis
         }
     }
 
+    // 服务创建时初始化操作
     @OptIn(ExperimentalCoilApi::class)
     override fun onCreate() {
         handler = Handler(Looper.getMainLooper())
@@ -161,7 +167,6 @@ class GramophonePlaybackService : MediaLibraryService(), MediaSessionService.Lis
             }
         )
         if (mayThrowForegroundServiceStartNotAllowed()) {
-            // we don't need notification permission because this only is run on S/S_V2
             nm.createNotificationChannel(NotificationChannelCompat.Builder(
                 NOTIFY_CHANNEL_ID, NotificationManagerCompat.IMPORTANCE_HIGH
             ).apply {
@@ -171,13 +176,12 @@ class GramophonePlaybackService : MediaLibraryService(), MediaSessionService.Lis
                 setLightsEnabled(false)
                 setShowBadge(false)
                 setSound(null, null)
-            }.build()
-            )
+            }.build())
         } else if (nm.getNotificationChannel(NOTIFY_CHANNEL_ID) != null) {
-            // for people who upgraded from S/S_V2 to newer version
             nm.deleteNotificationChannel(NOTIFY_CHANNEL_ID)
         }
 
+        // 设置自定义命令按钮
         customCommands =
             listOf(
                 CommandButton.Builder() // shuffle currently disabled, click will enable
@@ -217,6 +221,7 @@ class GramophonePlaybackService : MediaLibraryService(), MediaSessionService.Lis
                     .build(),
             )
 
+        // 初始化播放器
         val player = EndedWorkaroundPlayer(
             ExoPlayer.Builder(
                 this,
@@ -225,13 +230,11 @@ class GramophonePlaybackService : MediaLibraryService(), MediaSessionService.Lis
                         prefs.getBooleanStrict("floatoutput", false)
                     )
                     .setEnableDecoderFallback(true)
-                    .setEnableAudioTrackPlaybackParams( // hardware/system-accelerated playback speed
+                    .setEnableAudioTrackPlaybackParams(
                         prefs.getBooleanStrict("ps_hardware_acc", true)
                     )
                     .setExtensionRendererMode(DefaultRenderersFactory.EXTENSION_RENDERER_MODE_PREFER),
                 GramophoneMediaSourceFactory(this)
-                /* .setMp3ExtractorFlags(Mp3Extractor.FLAG_ENABLE_INDEX_SEEKING))
-            TODO flag breaks playback of AcousticGuitar.mp3, report exo bug + add UI toggle*/
             )
                 .setWakeMode(C.WAKE_MODE_LOCAL)
                 .setSkipSilenceEnabled(prefs.getBooleanStrict("skip_silence", false))
@@ -245,6 +248,7 @@ class GramophonePlaybackService : MediaLibraryService(), MediaSessionService.Lis
                 .build()
         )
 
+        // 打开音效控制会话
         sendBroadcast(Intent(AudioEffect.ACTION_OPEN_AUDIO_EFFECT_CONTROL_SESSION).apply {
             putExtra(AudioEffect.EXTRA_PACKAGE_NAME, packageName)
             putExtra(AudioEffect.EXTRA_AUDIO_SESSION, player.exoPlayer.audioSessionId)
@@ -253,12 +257,12 @@ class GramophonePlaybackService : MediaLibraryService(), MediaSessionService.Lis
         lastPlayedManager = LastPlayedManager(this, player)
         lastPlayedManager.allowSavingState = false
 
+        // 创建媒体会话
         mediaSession =
             MediaLibrarySession
                 .Builder(this, player, this)
                 .setBitmapLoader(object : BitmapLoader {
-                    // Coil-based bitmap loader to reuse Coil's caching and to make sure we use
-                    // the same cover art as the rest of the app, ie MediaStore's cover
+                    // 使用Coil加载位图
 
                     override fun decodeBitmap(data: ByteArray) =
                         throw UnsupportedOperationException("decodeBitmap() not supported")
@@ -330,9 +334,7 @@ class GramophonePlaybackService : MediaLibraryService(), MediaSessionService.Lis
                         )
                     } catch (e: IllegalSeekPositionException) {
                         Log.e(TAG, "failed to restore: " + Log.getStackTraceString(e))
-                        // song was edited to be shorter and playback position doesn't exist anymore
                     }
-                    // Prepare Player after UI thread is less busy (loads tracks, required for lyric)
                     handler.post {
                         controller?.prepare()
                     }
@@ -340,7 +342,7 @@ class GramophonePlaybackService : MediaLibraryService(), MediaSessionService.Lis
                 lastPlayedManager.allowSavingState = true
             }
         }
-        onShuffleModeEnabledChanged(controller!!.shuffleModeEnabled) // refresh custom commands
+        onShuffleModeEnabledChanged(controller!!.shuffleModeEnabled)
         controller!!.addListener(this)
         registerReceiver(
             headSetReceiver,
@@ -348,10 +350,8 @@ class GramophonePlaybackService : MediaLibraryService(), MediaSessionService.Lis
         )
     }
 
-    // When destroying, we should release server side player
-    // alongside with the mediaSession.
+    // 服务销毁时执行的操作
     override fun onDestroy() {
-        // Important: this must happen before sending stop() as that changes state ENDED -> IDLE
         lastPlayedManager.save()
         mediaSession!!.player.stop()
         sendBroadcast(Intent(AudioEffect.ACTION_CLOSE_AUDIO_EFFECT_CONTROL_SESSION).apply {
@@ -371,12 +371,11 @@ class GramophonePlaybackService : MediaLibraryService(), MediaSessionService.Lis
         super.onDestroy()
     }
 
-    // This onGetSession is a necessary method override needed by
-    // MediaSessionService.
+    // 获取当前会话
     override fun onGetSession(controllerInfo: MediaSession.ControllerInfo): MediaLibrarySession? =
         mediaSession
 
-    // Configure commands available to the controller in onConnect()
+    // 配置连接时可用的命令
     override fun onConnect(session: MediaSession, controller: MediaSession.ControllerInfo)
             : MediaSession.ConnectionResult {
         val availableSessionCommands =
@@ -384,10 +383,7 @@ class GramophonePlaybackService : MediaLibraryService(), MediaSessionService.Lis
         if (session.isMediaNotificationController(controller)
             || session.isAutoCompanionController(controller)
             || session.isAutomotiveController(controller)) {
-            // currently, all custom actions are only useful when used by notification
-            // other clients hopefully have repeat/shuffle buttons like MCT does
             for (commandButton in customCommands) {
-                // Add custom command to available session commands.
                 commandButton.sessionCommand?.let { availableSessionCommands.add(it) }
             }
         }
@@ -406,6 +402,7 @@ class GramophonePlaybackService : MediaLibraryService(), MediaSessionService.Lis
             .build()
     }
 
+    // 处理自定义命令
     override fun onCustomCommand(
         session: MediaSession,
         controller: MediaSession.ControllerInfo,
@@ -424,7 +421,6 @@ class GramophonePlaybackService : MediaLibraryService(), MediaSessionService.Lis
             }
 
             SERVICE_SET_TIMER -> {
-                // 0 = clear timer
                 customCommand.customExtras.getInt("duration").let {
                     timerDuration = if (it > 0) System.currentTimeMillis() + it else null
                 }
@@ -466,6 +462,7 @@ class GramophonePlaybackService : MediaLibraryService(), MediaSessionService.Lis
         })
     }
 
+    // 播放恢复时执行的操作
     override fun onPlaybackResumption(
         mediaSession: MediaSession,
         controller: MediaSession.ControllerInfo
@@ -486,6 +483,7 @@ class GramophonePlaybackService : MediaLibraryService(), MediaSessionService.Lis
         return settable
     }
 
+    // 当曲目变化时执行的操作
     override fun onTracksChanged(tracks: Tracks) {
         val mediaItem = controller!!.currentMediaItem
         lyricsLock.runInBg {
@@ -497,10 +495,8 @@ class GramophonePlaybackService : MediaLibraryService(), MediaSessionService.Lis
                 loop@ for (i in tracks.groups) {
                     for (j in 0 until i.length) {
                         if (!i.isTrackSelected(j)) continue
-                        // note: wav files can have null metadata
                         val trackMetadata = i.getTrackFormat(j).metadata ?: continue
                         lrc = extractAndParseLyrics(trackMetadata, trim, multiLine) ?: continue
-                        // add empty element at the beginning
                         lrc.add(0, MediaStoreUtils.Lyric())
                         break@loop
                     }
@@ -518,28 +514,28 @@ class GramophonePlaybackService : MediaLibraryService(), MediaSessionService.Lis
         }
     }
 
+    // 当媒体项切换时执行的操作
     override fun onMediaItemTransition(mediaItem: MediaItem?, reason: Int) {
         lyrics = null
         lastPlayedManager.save()
     }
 
+    // 当播放状态变化时执行的操作
     override fun onIsPlayingChanged(isPlaying: Boolean) {
         lastPlayedManager.save()
     }
 
+    // 处理播放器事件
     override fun onEvents(player: Player, events: Player.Events) {
         super.onEvents(player, events)
-        // if timeline changed, handle shuffle update in onTimelineChanged() instead
-        // (onTimelineChanged() runs before both this callback and onShuffleModeEnabledChanged(),
-        // which means shuffleFactory != null is not a valid check)
         if (events.contains(EVENT_SHUFFLE_MODE_ENABLED_CHANGED) &&
             shuffleFactory == null && !events.contains(Player.EVENT_TIMELINE_CHANGED)) {
-            // when enabling shuffle, re-shuffle lists so that the first index is up to date
             applyShuffleSeed(false) { c -> { CircularShuffleOrder(
                 it, c, controller!!.mediaItemCount, Random.nextLong()) } }
         }
     }
 
+    // 当启用随机播放模式时执行的操作
     override fun onShuffleModeEnabledChanged(shuffleModeEnabled: Boolean) {
         super.onShuffleModeEnabledChanged(shuffleModeEnabled)
         mediaSession!!.setCustomLayout(ImmutableList.of(getRepeatCommand(), getShufflingCommand()))
@@ -548,6 +544,7 @@ class GramophonePlaybackService : MediaLibraryService(), MediaSessionService.Lis
         }
     }
 
+    // 当时间线变化时执行的操作
     override fun onTimelineChanged(timeline: Timeline, reason: Int) {
         super.onTimelineChanged(timeline, reason)
         if (reason == Player.TIMELINE_CHANGE_REASON_PLAYLIST_CHANGED) {
@@ -558,6 +555,7 @@ class GramophonePlaybackService : MediaLibraryService(), MediaSessionService.Lis
         }
     }
 
+    // 当重复模式变化时执行的操作
     override fun onRepeatModeChanged(repeatMode: Int) {
         super.onRepeatModeChanged(repeatMode)
         mediaSession!!.setCustomLayout(ImmutableList.of(getRepeatCommand(), getShufflingCommand()))
@@ -566,7 +564,8 @@ class GramophonePlaybackService : MediaLibraryService(), MediaSessionService.Lis
         }
     }
 
-    @SuppressLint("MissingPermission") // only used on S/S_V2
+    // 处理前台服务启动不允许异常
+    @SuppressLint("MissingPermission")
     override fun onForegroundServiceStartNotAllowedException() {
         Log.w(TAG, "Failed to resume playback :/")
         if (mayThrowForegroundServiceStartNotAllowed()) {
@@ -598,6 +597,7 @@ class GramophonePlaybackService : MediaLibraryService(), MediaSessionService.Lis
         }
     }
 
+    // 应用随机播放种子
     private fun applyShuffleSeed(lazy: Boolean, factory:
         (Int) -> ((CircularShuffleOrder) -> Unit) -> CircularShuffleOrder) {
         if (lazy) {
