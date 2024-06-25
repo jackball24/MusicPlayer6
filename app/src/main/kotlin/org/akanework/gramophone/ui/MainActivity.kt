@@ -183,7 +183,6 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
-    // https://twitter.com/Piwai/status/1529510076196630528
     override fun reportFullyDrawn() {
         handler.removeCallbacks(reportFullyDrawnRunnable)
         if (ready) throw IllegalStateException("ready is already true")

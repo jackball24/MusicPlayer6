@@ -8,7 +8,7 @@
     <string name="category_albums">专辑</string>
     <string name="category_artists">艺术家</string>
     <string name="category_genres">艺术流派</string>
-    <string name="category_playlists">列表</string>
+    <string name="category_playlists">歌单</string>
     <string name="unknown_artist">未知艺术家</string>
     <string name="category_dates">发行日期</string>
     <string name="follow_system">跟随系统</string>
@@ -28,6 +28,7 @@
     <string name="settings_app_name">应用名称</string>
     <string name="settings_contributors">贡献者</string>
     <string name="play_next">添加至下一曲</string>
+    <string name="add">添加至歌单</string>
     <string name="go_to_album">专辑..</string>
     <string name="go_to_artist">艺术家..</string>
     <string name="details">详细</string>

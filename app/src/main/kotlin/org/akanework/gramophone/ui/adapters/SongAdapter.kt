@@ -226,67 +226,19 @@ class SongAdapter(
                     }
                     true
                 }
-                R.id.addtoList -> {
-                    showAddToPlaylistDialog(item)
+
+
+                R.id.add -> {
+
+
                     true
                 }
-
                 else -> false
             }
         }
     }
 
-    private fun showAddToPlaylistDialog(item: MediaItem) {
-        val builder = AlertDialog.Builder(mainActivity)
-        builder.setTitle("添加到播放列表")
 
-        val dialogView = LayoutInflater.from(mainActivity).inflate(R.layout.dialog_add_playlist, null)
-        builder.setView(dialogView)
-
-        val recyclerView = dialogView.findViewById<RecyclerView>(R.id.recyclerview_playlists)
-        recyclerView.layoutManager = LinearLayoutManager(mainActivity)
-
-        val playlistLiveData = viewModel.playlistList
-        val adapter = PlaylistAdapter(fragment, playlistLiveData) { selectedPlaylist ->
-            addSongToPlaylist(item, selectedPlaylist)
-        }
-        recyclerView.adapter = adapter
-
-        val editTextPlaylistName = dialogView.findViewById<EditText>(R.id.edittext_playlist_name)
-        val buttonCreatePlaylist = dialogView.findViewById<Button>(R.id.button_create_playlist)
-
-        buttonCreatePlaylist.setOnClickListener {
-            val newPlaylistName = editTextPlaylistName.text.toString().trim()
-            if (newPlaylistName.isNotEmpty()) {
-                // 处理创建新播放列表逻辑
-                createNewPlaylist(newPlaylistName)
-                // 更新播放列表 RecyclerView
-                playlistLiveData.value = playlistLiveData.value?.plus(MediaStoreUtils.Playlist(newPlaylistName, listOf()))
-                adapter.notifyItemInserted(playlistLiveData.value!!.size - 1)
-                editTextPlaylistName.text.clear()
-            } else {
-                Toast.makeText(mainActivity, "请输入播放列表名称", Toast.LENGTH_SHORT).show()
-            }
-        }
-
-        builder.setNegativeButton("取消") { dialog, _ -> dialog.dismiss() }
-        builder.setPositiveButton("完成") { dialog, _ -> dialog.dismiss() }
-
-        builder.show()
-    }
-
-    private fun addSongToPlaylist(item: MediaItem, playlist: MediaStoreUtils.Playlist) {
-        // 实现将歌曲添加到指定播放列表的逻辑
-        // 例如，更新 ViewModel 或数据库
-        playlist.songList = playlist.songList + item // 假设 songList 是一个可变列表
-        Toast.makeText(mainActivity, "已添加到 ${playlist.title}", Toast.LENGTH_SHORT).show()
-    }
-
-    private fun createNewPlaylist(playlistName: String) {
-        // 实现创建新播放列表的逻辑
-        // 例如，更新 ViewModel 或数据库
-        Toast.makeText(mainActivity, "已创建播放列表 $playlistName", Toast.LENGTH_SHORT).show()
-    }
 
     override fun onBindViewHolder(holder: ViewHolder, position: Int, payloads: MutableList<Any>) {
         if (payloads.isNotEmpty()) {

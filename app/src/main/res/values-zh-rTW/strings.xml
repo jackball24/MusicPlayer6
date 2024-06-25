@@ -8,7 +8,7 @@
     <string name="category_albums">專輯</string>
     <string name="category_artists">藝術家</string>
     <string name="category_genres">藝術流派</string>
-    <string name="category_playlists">列表</string>
+    <string name="category_playlists">歌單</string>
     <string name="unknown_artist">未知藝術家</string>
     <string name="category_dates">發行日期</string>
     <string name="follow_system">跟隨系統</string>
@@ -25,6 +25,7 @@
     <string name="unknown_year">未知年份</string>
     <string name="refreshed_songs">重新整理了 %1$s 首歌曲。</string>
     <string name="search">搜尋</string>
+    <string name="add">添加至歌單</string>
     <string name="settings_app_name">應用名稱</string>
     <string name="settings_contributors">貢獻者</string>
     <string name="play_next">添加至下一曲</string>

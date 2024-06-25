@@ -123,13 +123,11 @@ class GramophonePlaybackService : MediaLibraryService(), MediaSessionService.Lis
         else
             customCommands[0]
 
-    // 定时器任务，时间到暂停播放
     private val timer: Runnable = Runnable {
         controller!!.pause()
         timerDuration = null
     }
 
-    // 定时器持续时间设置
     private var timerDuration: Long? = null
         set(value) {
             field = value
@@ -322,6 +320,9 @@ class GramophonePlaybackService : MediaLibraryService(), MediaSessionService.Lis
                 )
                 .build()
         controller = MediaController.Builder(this, mediaSession!!.token).buildAsync().get()
+        /*
+        将mediaSession添加到消息队列末尾，在主线程执行
+        * */
         handler.post {
             if (mediaSession == null) return@post
             lastPlayedManager.restore { items, factory ->
@@ -350,7 +351,7 @@ class GramophonePlaybackService : MediaLibraryService(), MediaSessionService.Lis
         )
     }
 
-    // 服务销毁时执行的操作
+
     override fun onDestroy() {
         lastPlayedManager.save()
         mediaSession!!.player.stop()
@@ -483,7 +484,6 @@ class GramophonePlaybackService : MediaLibraryService(), MediaSessionService.Lis
         return settable
     }
 
-    // 当曲目变化时执行的操作
     override fun onTracksChanged(tracks: Tracks) {
         val mediaItem = controller!!.currentMediaItem
         lyricsLock.runInBg {
@@ -501,6 +501,7 @@ class GramophonePlaybackService : MediaLibraryService(), MediaSessionService.Lis
                     }
                 }
             }
+            //协程执行，挂起函数，不阻塞线程，生命周期为viewmodel
             CoroutineScope(Dispatchers.Main).launch {
                 mediaSession?.let {
                     lyrics = lrc

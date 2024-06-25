@@ -56,7 +56,10 @@ class PlaylistAdapter(
                     )
                     true
                 }
+                R.id.delete -> {
 
+                    true
+                }
                 else -> false
             }
         }
