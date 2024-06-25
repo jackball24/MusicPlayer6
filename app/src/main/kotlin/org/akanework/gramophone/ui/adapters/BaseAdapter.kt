@@ -1,6 +1,8 @@
 package org.akanework.gramophone.ui.adapters
 
 import android.annotation.SuppressLint
+import android.app.AlertDialog
+import android.content.Context
 import android.content.res.Configuration
 import android.net.Uri
 import android.os.Handler
@@ -9,14 +11,20 @@ import android.os.Looper
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.ArrayAdapter
+import android.widget.Button
+import android.widget.EditText
 import android.widget.ImageView
+import android.widget.ListView
 import android.widget.TextView
+import android.widget.Toast
 import androidx.appcompat.widget.PopupMenu
 import androidx.core.view.doOnLayout
 import androidx.core.view.updateLayoutParams
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.Observer
+import androidx.media3.common.MediaItem
 import androidx.preference.PreferenceManager
 import androidx.recyclerview.widget.ConcatAdapter
 import androidx.recyclerview.widget.DiffUtil
@@ -47,7 +55,7 @@ import java.util.Collections
 
 abstract class BaseAdapter<T>(
     protected val fragment: Fragment,
-    protected var liveData: MutableLiveData<List<T>>?,
+    var liveData: MutableLiveData<List<T>>?,
     sortHelper: Sorter.Helper<T>,
     naturalOrderHelper: Sorter.NaturalOrderHelper<T>?,
     initialSortType: Sorter.Type,
@@ -63,10 +71,9 @@ abstract class BaseAdapter<T>(
     PopupTextProvider, ItemHeightHelper {
 
     companion object {
-        // this relies on the assumption that all RecyclerViews always have same width
-        // (though it does get invalidated if that is not the case, for eg rotation)
         private var gridHeightCache = 0
     }
+
     val context = fragment.requireContext()
     protected inline val mainActivity
         get() = context as MainActivity
@@ -135,12 +142,12 @@ abstract class BaseAdapter<T>(
                 }
             }
             calculateGridSizeIfNeeded()
-            notifyDataSetChanged() // we change view type for all items
+            notifyDataSetChanged()
         }
     private var reverseRaw = false
     var sortType: Sorter.Type
         get() = if (comparator == null && rawOrderExposed)
-                (if (reverseRaw) Sorter.Type.NativeOrderDescending else Sorter.Type.NativeOrder)
+            (if (reverseRaw) Sorter.Type.NativeOrderDescending else Sorter.Type.NativeOrder)
         else comparator?.type!!
         private set(value) {
             reverseRaw = value == Sorter.Type.NativeOrderDescending
@@ -226,7 +233,6 @@ abstract class BaseAdapter<T>(
     }
 
     private fun applyLayoutManager() {
-        // If a layout manager has already been set, get current scroll position.
         val scrollPosition = if (recyclerView?.layoutManager != null) {
             (recyclerView!!.layoutManager as LinearLayoutManager)
                 .findFirstCompletelyVisibleItemPosition()
@@ -259,9 +265,6 @@ abstract class BaseAdapter<T>(
 
     @SuppressLint("NotifyDataSetChanged")
     private fun sort(srcList: List<T>? = null, canDiff: Boolean): () -> () -> Unit {
-        // Ensure rawList is only accessed on UI thread
-        // and ensure calls to this method go in order
-        // to prevent funny IndexOutOfBoundsException crashes
         val newList = ArrayList(srcList ?: rawList)
         if (!listLock.tryAcquire()) {
             throw IllegalStateException("listLock already held, add now = true to the caller")
@@ -364,7 +367,6 @@ abstract class BaseAdapter<T>(
         }
     }
 
-    // need to call notifyDataSetChanged() afterwards
     private fun calculateGridSizeIfNeeded(): Boolean {
         if (recyclerView != null && layoutType == LayoutType.GRID && gridHeight == null
             && recyclerView!!.width != 0) {
@@ -373,18 +375,16 @@ abstract class BaseAdapter<T>(
             val marginLabel = context.resources.getDimensionPixelSize(R.dimen.grid_card_margin_label)
             val paddingBottom = context.resources.getDimensionPixelSize(R.dimen.grid_card_padding_bottom)
             val labelHeight = context.resources.getDimensionPixelSize(R.dimen.grid_card_label_height)
-            // first find out cover's width...
             var w = recyclerView!!.width
-            w -= recyclerView!!.paddingLeft + recyclerView!!.paddingRight // view padding
-            w -= 2 * cardPadding // item decoration
-            w /= (layoutManager as? GridLayoutManager)?.spanCount ?: fallbackSpans // we want width of one item
-            w -= 2 * cardPadding // side padding
-            // ...then use it to calculate height
-            var h = w // cover is constrained 1:1
-            h += marginTop // top padding of cover
-            h += labelHeight // account for label height
-            h += 2 * marginLabel // label vertical margin
-            h += paddingBottom // bottom padding of whole card
+            w -= recyclerView!!.paddingLeft + recyclerView!!.paddingRight
+            w -= 2 * cardPadding
+            w /= (layoutManager as? GridLayoutManager)?.spanCount ?: fallbackSpans
+            w -= 2 * cardPadding
+            var h = w
+            h += marginTop
+            h += labelHeight
+            h += 2 * marginLabel
+            h += paddingBottom
             gridHeight = h
             return if (h == gridHeightCache) false else {
                 gridHeightCache = gridHeight!!
@@ -457,10 +457,6 @@ abstract class BaseAdapter<T>(
     }
 
     final override fun getPopupText(view: View, position: Int): CharSequence {
-        // position here refers to pos in ConcatAdapter(!)
-        // 1 == decorAdapter.itemCount
-        // if this crashes with IndexOutOfBoundsException, list access isn't guarded enough?
-        // lib only ever gets popup text for what RecyclerView believes to be the first view
         return (if (position >= 1)
             sorter.getFastScrollHintFor(list[position - 1], sortType)
         else null) ?: "-"
@@ -502,5 +498,28 @@ abstract class BaseAdapter<T>(
             LayoutType.LIST, null -> largerListHeight
             else -> throw IllegalArgumentException()
         }
+    }
+
+    private fun showSelectPlaylistDialog(song: MediaItem) {
+        val dialogView = layoutInflater.inflate(R.layout.dialog_select_playlist, null)
+        val playlistListView = dialogView.findViewById<ListView>(R.id.playlist_list)
+
+        val playlists = liveData?.value?.filterIsInstance<MediaStoreUtils.Playlist>() ?: emptyList()
+        val playlistAdapter = ArrayAdapter(context, android.R.layout.simple_list_item_1, playlists.map { it.title })
+        playlistListView.adapter = playlistAdapter
+
+        val dialog = AlertDialog.Builder(context)
+            .setTitle(R.string.select_playlist)
+            .setView(dialogView)
+            .create()
+
+        playlistListView.setOnItemClickListener { _, _, position, _ ->
+            val selectedPlaylist = playlists[position]
+            selectedPlaylist.songList.add(song)
+            liveData?.value = liveData?.value
+            dialog.dismiss()
+        }
+
+        dialog.show()
     }
 }

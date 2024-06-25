@@ -93,6 +93,12 @@
     <string name="opensource_info">Open-sourced under GPL-3.0\nCopyright © 2024 Akane Foundation</string>
     <string name="playlist_favourite">Favourite</string>
     <!-- Not translatable -->
+    <string name="playlist_template">Playlist: %1$s</string>
+    <string name="enter_valid_name">请输入可用名字</string>
+    <string name="create_playlist">创建播放列表</string>
+    <string name="enter_playlist_name">确认创建播放列表</string>
+    <string name="create">创建</string>
+    <string name="select_playlist">选择播放列表</string>
     <string name="app_name" translatable="false">MusicPlayer</string>
     <string name="default_time" translatable="false">0:00</string>
     <string name="settings_contributors_detail" translatable="false">AkaneTan, 123Duo3, nift4, WSTxda</string>

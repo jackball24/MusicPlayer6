@@ -116,6 +116,9 @@ object MediaStoreUtils {
         override var songList: MutableList<MediaItem>
     ) : Item
 
+
+
+
     @Parcelize
     data class Lyric(
         val timeStamp: Long? = null,
@@ -135,7 +138,7 @@ object MediaStoreUtils {
                     filteredList = null
                 }
             }
-        override val songList: MutableList<MediaItem>
+        override var songList: MutableList<MediaItem> = mutableListOf()
             get() {
                 if (filteredList == null) {
                     val queue = PriorityQueue(rawList)

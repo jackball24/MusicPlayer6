@@ -228,11 +228,7 @@ class SongAdapter(
                 }
 
 
-                R.id.add -> {
 
-
-                    true
-                }
                 else -> false
             }
         }

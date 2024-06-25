@@ -36,6 +36,7 @@
             android:insetBottom="0dp"
             android:visibility="gone"
             app:iconGravity="textStart"
+            app:icon="@drawable/ic_playlist_add"
             app:iconPadding="0dp"
             app:iconSize="26dp"
             app:iconTint="?attr/colorPrimary"
