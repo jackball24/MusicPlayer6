@@ -25,6 +25,23 @@
         android:layout_marginEnd="9dp">
 
         <com.google.android.material.button.MaterialButton
+            android:id="@+id/playlist_add"
+            android:layout_width="42dp"
+            android:layout_height="42dp"
+            android:background="@drawable/rp_buttons"
+            android:insetLeft="0dp"
+            android:insetTop="0dp"
+            android:insetRight="0dp"
+            android:insetBottom="0dp"
+            android:visibility="gone"
+            app:icon="@drawable/ic_playlist_add"
+            app:iconGravity="textStart"
+            app:iconPadding="0dp"
+            app:iconSize="26dp"
+            app:iconTint="?attr/colorPrimary"
+            tools:visibility="visible" />
+
+        <com.google.android.material.button.MaterialButton
             android:id="@+id/play_all"
             android:layout_width="42dp"
             android:layout_height="42dp"
