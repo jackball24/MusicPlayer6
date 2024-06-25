@@ -241,12 +241,17 @@ class SongAdapter(
 
 
     private fun showAddToPlaylistDialog(item: MediaItem) {
-        val playlistNames = viewModel.playlistList.value?.map { it.title ?: "Unknown Playlist" }?.toTypedArray()
+        // 过滤掉ID为-1的播放列表和标题为"收藏"的播放列表
+        val filteredPlaylists = viewModel.playlistList.value?.filter {
+            it.id != -1L && !it.title.equals("收藏", ignoreCase = true)
+        }
+
+        val playlistNames = filteredPlaylists?.map { it.title ?: "Unknown Playlist" }?.toTypedArray()
 
         AlertDialog.Builder(context)
             .setTitle("Add to Playlist")
             .setItems(playlistNames) { dialog, which ->
-                val selectedPlaylist = viewModel.playlistList.value?.get(which)
+                val selectedPlaylist = filteredPlaylists?.get(which)
                 selectedPlaylist?.let {
                     addToPlaylist(item, it)
                 }
@@ -255,12 +260,12 @@ class SongAdapter(
             .show()
     }
 
-    private fun addToPlaylist(songToAdd: MediaItem, targetPlaylist: MediaStoreUtils.Playlist) {
 
+    private fun addToPlaylist(songToAdd: MediaItem, targetPlaylist: MediaStoreUtils.Playlist) {
         val resolver = context.contentResolver
         val values = ContentValues().apply {
             put(MediaStore.Audio.Playlists.Members.AUDIO_ID, songToAdd.mediaId)
-            put(MediaStore.Audio.Playlists.Members.PLAY_ORDER, 0) // 可以根据实际情况设置播放顺序
+            put(MediaStore.Audio.Playlists.Members.PLAY_ORDER, 0)
         }
 
         val uri = resolver.insert(
@@ -270,7 +275,6 @@ class SongAdapter(
 
         // 检查插入是否成功，并且根据需要更新界面或显示消息
         if (uri != null) {
-
             val updatedPlaylist = viewModel.playlistList.value?.map { playlist ->
                 if (playlist.id == targetPlaylist.id) {
                     // 更新目标播放列表中的歌曲列表
@@ -285,7 +289,7 @@ class SongAdapter(
 
             viewModel.playlistList.postValue(updatedPlaylist)
 
-            // 显示消息，
+            // 显示消息
             Toast.makeText(context, "Song added to playlist ${targetPlaylist.title}", Toast.LENGTH_SHORT).show()
         } else {
             Toast.makeText(context, "Failed to add song to playlist", Toast.LENGTH_SHORT).show()

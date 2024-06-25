@@ -184,7 +184,6 @@ object MediaStoreUtils {
         }
     }
 
-//给定的文件路径 path 添加到文件系统的目录结构中，并返回最后一个节点
     private fun handleMediaFolder(path: String, rootNode: FileNode): FileNode {
         val newPath = if (path.endsWith('/')) path.substring(1, path.length - 1)
         else path.substring(1)
