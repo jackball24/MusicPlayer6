@@ -200,7 +200,15 @@ open class BaseDecorAdapter<T : BaseAdapter<*>>(
         //add_to_list的事件监听，进行创建一个弹出框，用于输入添加的playlist的名称
         holder.addtoList.setOnClickListener {
             if(adapter is PlaylistAdapter){
-                PlaylistAdapter.createNewPlaylist(this.context)
+                PlaylistAdapter.createNewPlaylist(this.context) {
+                    if (context is MainActivity) {
+                        context.updateLibrary {
+                            // 在这里执行您的刷新逻辑
+                            holder.itemView.invalidate()
+                            adapter.notifyDataSetChanged()
+                        }
+                    }
+                }
             }
         }
     }

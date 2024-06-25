@@ -9,7 +9,9 @@ import android.widget.EditText
 import android.widget.Toast
 import androidx.appcompat.widget.PopupMenu
 import androidx.fragment.app.Fragment
+import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.MutableLiveData
+import androidx.lifecycle.Observer
 import org.akanework.gramophone.R
 import org.akanework.gramophone.logic.utils.MediaStoreUtils
 import org.akanework.gramophone.ui.fragments.GeneralSubFragment
@@ -70,7 +72,8 @@ class PlaylistAdapter(
 
     companion object {
         val playlistList = MutableLiveData<List<MediaStoreUtils.Playlist>>(listOf())
-        fun createNewPlaylist(context: Context) {
+        fun createNewPlaylist(context: Context,
+                              onPlaylistCreated: () -> Unit) {
             // 创建一个输入对话框，获取用户输入的播放列表名称
             val builder = AlertDialog.Builder(context)
             builder.setTitle("创建新播放列表")
