@@ -8,7 +8,7 @@
     <string name="category_albums">專輯</string>
     <string name="category_artists">藝術家</string>
     <string name="category_genres">藝術流派</string>
-    <string name="category_playlists">列表</string>
+    <string name="category_playlists">歌單</string>
     <string name="unknown_artist">未知藝術家</string>
     <string name="category_dates">發行日期</string>
     <string name="follow_system">跟隨系統</string>
@@ -31,6 +31,7 @@
     <string name="go_to_album">專輯..</string>
     <string name="go_to_artist">藝術家..</string>
     <string name="details">詳細</string>
+    <string name="add_to_list">添加到歌單</string>
     <string name="shuffle">隨機</string>
     <string name="repeat_mode">循環模式</string>
     <string name="unknown_playlist">未知播放列表</string>
