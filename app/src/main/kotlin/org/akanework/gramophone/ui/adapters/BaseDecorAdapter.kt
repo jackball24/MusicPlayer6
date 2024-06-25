@@ -1,10 +1,17 @@
 package org.akanework.gramophone.ui.adapters
 
+import android.app.AlertDialog
+import android.content.ContentValues
+import android.content.ContentValues.TAG
 import android.content.Context
+import android.provider.MediaStore
+import android.util.Log
 import android.view.MenuItem
 import android.view.View
 import android.view.ViewGroup
+import android.widget.EditText
 import android.widget.TextView
+import android.widget.Toast
 import androidx.appcompat.widget.PopupMenu
 import androidx.core.content.edit
 import androidx.media3.common.C
@@ -17,6 +24,7 @@ import com.google.android.material.button.MaterialButton
 import org.akanework.gramophone.R
 import org.akanework.gramophone.logic.ui.ItemHeightHelper
 import org.akanework.gramophone.logic.ui.MyRecyclerView
+import org.akanework.gramophone.logic.utils.MediaStoreUtils
 import org.akanework.gramophone.ui.getAdapterType
 import kotlin.random.Random
 
@@ -40,6 +48,7 @@ open class BaseDecorAdapter<T : BaseAdapter<*>>(
         val view = adapter.layoutInflater.inflate(R.layout.general_decor, parent, false)
         return ViewHolder(view)
     }
+
 
     final override fun onBindViewHolder(holder: ViewHolder, position: Int) {
         val count = adapter.itemCount
@@ -178,7 +187,7 @@ open class BaseDecorAdapter<T : BaseAdapter<*>>(
         holder.jumpDown.setOnClickListener {
             scrollToViewPosition(jumpDownPos!!)
         }
-    }
+ }
 
     override fun onAttachedToRecyclerView(recyclerView: MyRecyclerView) {
         super.onAttachedToRecyclerView(recyclerView)
@@ -220,6 +229,7 @@ open class BaseDecorAdapter<T : BaseAdapter<*>>(
         recyclerView?.startSmoothScrollCompat(smoothScroller)
     }
 
+
     protected open fun onSortButtonPressed(popupMenu: PopupMenu) {}
     protected open fun onExtraMenuButtonPressed(menuItem: MenuItem): Boolean = false
 
@@ -235,9 +245,58 @@ open class BaseDecorAdapter<T : BaseAdapter<*>>(
         val jumpDown: MaterialButton = view.findViewById(R.id.jumpDown)
         val counter: TextView = view.findViewById(R.id.song_counter)
         val addtoList: MaterialButton = view.findViewById(R.id.playlist_add)
+
+        init {
+            addtoList.setOnClickListener {
+                showAddListDialog()
+
+            }
+
+        }
+        fun addPlaylist(context: Context, playlistName: String): Long {
+            val resolver = context.contentResolver
+            val values = ContentValues().apply {
+                put(MediaStore.Audio.Playlists.NAME, playlistName)
+                put(MediaStore.Audio.Playlists.DATE_ADDED, System.currentTimeMillis() / 1000)
+                put(MediaStore.Audio.Playlists.DATE_MODIFIED, System.currentTimeMillis() / 1000)
+            }
+            val uri = resolver.insert(MediaStore.Audio.Playlists.EXTERNAL_CONTENT_URI, values)
+            return uri?.lastPathSegment?.toLong() ?: -1
+        }
+        private fun showAddListDialog() {
+            val editText = EditText(context).apply {
+                hint = "Enter playlist name"
+            }
+
+            val dialog = AlertDialog.Builder(context)
+                .setTitle("Add New Playlist")
+                .setView(editText)
+                .setPositiveButton("OK") { dialog, _ ->
+                    val playlistName = editText.text.toString().trim()
+                    if (playlistName.isNotEmpty()) {
+                        val playlistId = addPlaylist(context, playlistName)
+                        if (playlistId != -1L) {
+
+                            Toast.makeText(context, "Playlist created successfully", Toast.LENGTH_SHORT).show()
+
+                        } else {
+                            Toast.makeText(context, "Failed to create playlist", Toast.LENGTH_SHORT).show()
+                        }
+                    } else {
+                        Toast.makeText(context, "Playlist name cannot be empty", Toast.LENGTH_SHORT).show()
+                    }
+                }
+                .setNegativeButton("Cancel") { dialog, _ ->
+                    dialog.cancel()
+                }
+                .create()
+
+            dialog.show()
+        }
+
     }
 
-    fun updateSongCounter() {
+        fun updateSongCounter() {
         notifyItemChanged(0)
     }
 
