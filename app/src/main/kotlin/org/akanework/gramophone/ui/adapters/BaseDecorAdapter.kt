@@ -1,12 +1,20 @@
 package org.akanework.gramophone.ui.adapters
 
+import android.app.AlertDialog
+import android.content.ContentValues
 import android.content.Context
+import android.provider.MediaStore
+import android.text.InputType
 import android.view.MenuItem
 import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
 import androidx.appcompat.widget.PopupMenu
 import androidx.core.content.edit
+import androidx.fragment.app.activityViewModels
+import androidx.lifecycle.MutableLiveData
+import androidx.lifecycle.ViewModelProvider
+import androidx.lifecycle.ViewModelStoreOwner
 import androidx.media3.common.C
 import androidx.media3.common.Player.REPEAT_MODE_OFF
 import androidx.preference.PreferenceManager
@@ -14,9 +22,14 @@ import androidx.recyclerview.widget.LinearSmoothScroller
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.button.MaterialButton
+import com.google.android.material.snackbar.Snackbar
 import org.akanework.gramophone.R
 import org.akanework.gramophone.logic.ui.ItemHeightHelper
 import org.akanework.gramophone.logic.ui.MyRecyclerView
+import org.akanework.gramophone.logic.utils.MediaStoreUtils
+import org.akanework.gramophone.ui.LibraryViewModel
+import org.akanework.gramophone.ui.MainActivity
+import org.akanework.gramophone.ui.fragments.AdapterFragment
 import org.akanework.gramophone.ui.getAdapterType
 import kotlin.random.Random
 
@@ -32,7 +45,10 @@ open class BaseDecorAdapter<T : BaseAdapter<*>>(
     private var prefs = PreferenceManager.getDefaultSharedPreferences(context)
     var jumpUpPos: Int? = null
     var jumpDownPos: Int? = null
-
+    private val libraryViewModel: LibraryViewModel by lazy {
+        // 获取 libraryViewModel，例如从 Context 中获取
+        ViewModelProvider(context as ViewModelStoreOwner).get(LibraryViewModel::class.java)
+    }
     override fun onCreateViewHolder(
         parent: ViewGroup,
         viewType: Int,
@@ -40,6 +56,7 @@ open class BaseDecorAdapter<T : BaseAdapter<*>>(
         val view = adapter.layoutInflater.inflate(R.layout.general_decor, parent, false)
         return ViewHolder(view)
     }
+
 
     final override fun onBindViewHolder(holder: ViewHolder, position: Int) {
         val count = adapter.itemCount
@@ -178,7 +195,14 @@ open class BaseDecorAdapter<T : BaseAdapter<*>>(
         holder.jumpDown.setOnClickListener {
             scrollToViewPosition(jumpDownPos!!)
         }
+        //add_to_list的事件监听，进行创建一个弹出框，用于输入添加的playlist的名称
+        holder.addtoList.setOnClickListener {
+            if(adapter is PlaylistAdapter){
+                PlaylistAdapter.createNewPlaylist(this.context)
+            }
+        }
     }
+
 
     override fun onAttachedToRecyclerView(recyclerView: MyRecyclerView) {
         super.onAttachedToRecyclerView(recyclerView)

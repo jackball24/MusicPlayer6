@@ -59,6 +59,7 @@ class AdapterFragment : BaseFragment(null) {
         }
     }
 
+
     override fun onDestroyView() {
         super.onDestroyView()
         adapter.concatAdapter.adapters.forEach {
@@ -71,4 +72,5 @@ class AdapterFragment : BaseFragment(null) {
         abstract val concatAdapter: ConcatAdapter
         abstract val itemHeightHelper: ItemHeightHelper?
     }
+
 }
