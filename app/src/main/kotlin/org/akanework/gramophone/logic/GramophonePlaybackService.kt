@@ -162,8 +162,8 @@ class GramophonePlaybackService : MediaLibraryService(), MediaSessionService.Lis
                 when (error.type) {
                     ExoPlaybackException.TYPE_SOURCE -> {
                         // 处理源错误，如文件损坏或格式不支持
-                        Log.e("PlayerError", "Source error: ${error.sourceException.message}")
-                        Toast.makeText(this, "无法播放该文件，请检查文件是否损坏或格式是否支持！！！", Toast.LENGTH_LONG).show()
+                        Log.e("PlayerError", "源文件错误: ${error.sourceException.message}")
+                        Toast.makeText(this, "无法播放，请检查文件是否损坏！", Toast.LENGTH_LONG).show()
                     }
                     ExoPlaybackException.TYPE_RENDERER -> {
                         // 处理渲染错误

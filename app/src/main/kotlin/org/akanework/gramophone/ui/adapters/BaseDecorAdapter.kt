@@ -42,7 +42,7 @@ open class BaseDecorAdapter<T : BaseAdapter<*>>(
 
     final override fun onBindViewHolder(holder: ViewHolder, position: Int) {
         val count = adapter.itemCount
-        holder.addToList.visibility=
+        holder.newPlaylist.visibility=
             if(adapter is PlaylistAdapter) View.VISIBLE else View.GONE
         holder.playAll.visibility =
             if (adapter is SongAdapter) View.VISIBLE else View.GONE
@@ -177,6 +177,11 @@ open class BaseDecorAdapter<T : BaseAdapter<*>>(
         holder.jumpDown.setOnClickListener {
             scrollToViewPosition(jumpDownPos!!)
         }
+        holder.newPlaylist.setOnClickListener {
+            if (adapter is PlaylistAdapter) {
+                PlaylistAdapter.newPlaylist(context)
+            }
+        }
     }
 
     override fun onAttachedToRecyclerView(recyclerView: MyRecyclerView) {
@@ -233,8 +238,7 @@ open class BaseDecorAdapter<T : BaseAdapter<*>>(
         val jumpUp: MaterialButton = view.findViewById(R.id.jumpUp)
         val jumpDown: MaterialButton = view.findViewById(R.id.jumpDown)
         val counter: TextView = view.findViewById(R.id.song_counter)
-        val addToList: MaterialButton = view.findViewById(R.id.playlist_add)
-
+        val newPlaylist: MaterialButton = view.findViewById(R.id.playlist_add)
     }
 
     fun updateSongCounter() {
