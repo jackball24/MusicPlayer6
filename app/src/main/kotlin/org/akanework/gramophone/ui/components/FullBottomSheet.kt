@@ -12,7 +12,6 @@ import android.graphics.Bitmap
 import android.graphics.drawable.BitmapDrawable
 import android.graphics.drawable.TransitionDrawable
 import android.media.AudioManager
-import android.text.format.DateFormat
 import android.util.AttributeSet
 import android.util.Size
 import android.view.Gravity
@@ -25,7 +24,6 @@ import android.widget.ImageView
 import android.widget.SeekBar
 import android.widget.TextView
 import androidx.appcompat.content.res.AppCompatResources
-import androidx.appcompat.widget.TooltipCompat
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.graphics.Insets
 import androidx.core.graphics.TypefaceCompat
@@ -59,8 +57,6 @@ import com.google.android.material.color.DynamicColors
 import com.google.android.material.color.DynamicColorsOptions
 import com.google.android.material.color.MaterialColors
 import com.google.android.material.slider.Slider
-import com.google.android.material.timepicker.MaterialTimePicker
-import com.google.android.material.timepicker.TimeFormat
 import com.google.common.util.concurrent.Futures
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -78,13 +74,11 @@ import org.akanework.gramophone.logic.getBooleanStrict
 import org.akanework.gramophone.logic.getFile
 import org.akanework.gramophone.logic.getIntStrict
 import org.akanework.gramophone.logic.getLyrics
-import org.akanework.gramophone.logic.getTimer
 import org.akanework.gramophone.logic.hasImagePermission
 import org.akanework.gramophone.logic.hasScopedStorageV1
 import org.akanework.gramophone.logic.hasScopedStorageWithMediaTypes
 import org.akanework.gramophone.logic.playOrPause
 import org.akanework.gramophone.logic.setTextAnimation
-import org.akanework.gramophone.logic.setTimer
 import org.akanework.gramophone.logic.startAnimation
 import org.akanework.gramophone.logic.ui.MyRecyclerView
 import org.akanework.gramophone.logic.ui.placeholderScaleToFit
@@ -953,9 +947,12 @@ class FullBottomSheet(context: Context, attrs: AttributeSet?, defStyleAttr: Int,
 		if (duration != null && !isUserTracking) {
 			bottomSheetFullSeekBar.max = duration.toInt()
 			bottomSheetFullSeekBar.progress = instance?.currentPosition?.toInt() ?: 0
-			bottomSheetFullSlider.valueTo = duration.toFloat().coerceAtLeast(1f)
-			bottomSheetFullSlider.value =
-				min(instance?.currentPosition?.toFloat() ?: 0f, bottomSheetFullSlider.valueTo)
+			if(duration.toFloat() > 0.0){
+				bottomSheetFullSlider.valueTo = duration.toFloat().coerceAtLeast(1f)
+				bottomSheetFullSlider.value =
+					min(instance?.currentPosition?.toFloat() ?: 0f, bottomSheetFullSlider.valueTo)
+			}
+
 			bottomSheetFullPosition.text = position
 		}
 		updateLyric(duration)
@@ -1412,9 +1409,12 @@ class FullBottomSheet(context: Context, attrs: AttributeSet?, defStyleAttr: Int,
 			if (duration != null && !isUserTracking) {
 				bottomSheetFullSeekBar.max = duration.toInt()
 				bottomSheetFullSeekBar.progress = instance?.currentPosition?.toInt() ?: 0
-				bottomSheetFullSlider.valueTo = duration.toFloat()
-				bottomSheetFullSlider.value =
-					min(instance?.currentPosition?.toFloat() ?: 0f, bottomSheetFullSlider.valueTo)
+				//IllegalStateException:valueFrom(0.0) must be smaller than valueTo(0.0)
+				if(duration.toFloat() > 0.0){
+					bottomSheetFullSlider.valueTo = duration.toFloat()
+					bottomSheetFullSlider.value =
+						min(instance?.currentPosition?.toFloat() ?: 0f, bottomSheetFullSlider.valueTo)
+				}
 				bottomSheetFullPosition.text = position
 			}
 			updateLyric(duration)

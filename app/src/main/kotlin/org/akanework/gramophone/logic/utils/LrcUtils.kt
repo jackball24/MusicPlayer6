@@ -177,7 +177,6 @@ object LrcUtils {
     }
 }
 
-// Class heavily based on MIT-licensed https://github.com/yoheimuta/ExoPlayerMusic/blob/77cfb989b59f6906b1170c9b2d565f9b8447db41/app/src/main/java/com/github/yoheimuta/amplayer/playback/UsltFrameDecoder.kt
 // See http://id3.org/id3v2.4.0-frames
 @OptIn(UnstableApi::class)
 private class UsltFrameDecoder {
