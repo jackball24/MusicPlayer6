@@ -19,6 +19,9 @@ import org.akanework.gramophone.ui.fragments.GeneralSubFragment
 /**
  * [PlaylistAdapter] is an adapter for displaying artists.
  */
+/*
+PlaylistAdapter 的构造函数接受一个 Fragment 和一个 MutableLiveData 列表。它调用 BaseAdapter 的构造函数，传递相关参数。
+ */
 class PlaylistAdapter(
     fragment: Fragment,
     playlistList: MutableLiveData<List<MediaStoreUtils.Playlist>>,

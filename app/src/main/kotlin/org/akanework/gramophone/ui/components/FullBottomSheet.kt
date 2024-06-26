@@ -136,10 +136,11 @@ class FullBottomSheet(context: Context, attrs: AttributeSet?, defStyleAttr: Int,
 		const val FOREGROUND_COLOR_TRANSITION_SEC: Long = 150
 		const val LYRIC_FADE_TRANSITION_SEC: Long = 125
 	}
-
+	//实现音乐进度条的事件监听事件，只要进度条改变了就会处理
 	private val touchListener = object : SeekBar.OnSeekBarChangeListener, Slider.OnSliderTouchListener {
 		override fun onProgressChanged(seekBar: SeekBar?, progress: Int, fromUser: Boolean) {
 			if (fromUser) {
+				//来自于用户的手动操作会获取当前媒体的时长、更新当前进度位置的文本
 				val dest = instance?.currentMediaItem?.mediaMetadata?.extras?.getLong("Duration")//获取长度
 				if (dest != null) {
 					bottomSheetFullPosition.text =
@@ -147,12 +148,25 @@ class FullBottomSheet(context: Context, attrs: AttributeSet?, defStyleAttr: Int,
 				}
 			}
 		}
-
+		/*
+		*当用户开始拖动 SeekBar 时：
+		将 isUserTracking 标志设为 true。
+		停止进度条的动画。
+		*
+		* */
 		override fun onStartTrackingTouch(seekBar: SeekBar?) {
 			isUserTracking = true
 			progressDrawable.animate = false
 		}
 
+		/*
+		*当用户停止拖动 SeekBar 时：
+		获取当前媒体项的 ID。
+		如果 seekBar 不为空，则将播放位置跳转到用户指定的位置，并同步歌词。
+		将 isUserTracking 标志设为 false。
+		如果媒体正在播放或准备播放，重新启动进度条动画。
+		*
+		* */
 		override fun onStopTrackingTouch(seekBar: SeekBar?) {
 			val mediaId = instance?.currentMediaItem?.mediaId
 			if (mediaId != null) {
@@ -380,13 +394,18 @@ class FullBottomSheet(context: Context, attrs: AttributeSet?, defStyleAttr: Int,
 				else -> throw IllegalStateException()
 			}
 		}
+		/**
+		 *
+		@authorKhalil
+
+		 */
 
 		// 播放列表按钮点击事件
 		bottomSheetPlaylistButton.setOnClickListener {
-			ViewCompat.performHapticFeedback(it, HapticFeedbackConstantsCompat.CONTEXT_CLICK)
+			ViewCompat.performHapticFeedback(it, HapticFeedbackConstantsCompat.CONTEXT_CLICK)//执行触觉反馈
 			val playlistBottomSheet = BottomSheetDialog(context)
 			playlistBottomSheet.setContentView(R.layout.playlist_bottom_sheet)
-			val recyclerView = playlistBottomSheet.findViewById<MyRecyclerView>(R.id.recyclerview)!!
+			val recyclerView = playlistBottomSheet.findViewById<MyRecyclerView>(R.id.recyclerview)!!//创建一个//BottomSheetDialog 并设置其内容布局为 playlist_bottom_sheet。
 			ViewCompat.setOnApplyWindowInsetsListener(recyclerView) { v, ic ->
 				val i = ic.getInsets(WindowInsetsCompat.Type.systemBars()
 						or WindowInsetsCompat.Type.displayCutout())
@@ -399,11 +418,15 @@ class FullBottomSheet(context: Context, attrs: AttributeSet?, defStyleAttr: Int,
 					.setInsetsIgnoringVisibility(WindowInsetsCompat.Type.systemBars()
 							or WindowInsetsCompat.Type.displayCutout(), Insets.of(0, i2.top, 0, 0))
 					.build()
-			}
+			}//设置插入监听器，调整调整 RecyclerView 的边距以适应系统条和显示切口
+
+			//创建并设置播放列表的适配器和拖动回调，允许用户在列表中拖动条目
 			val playlistAdapter = PlaylistCardAdapter(activity)
 			val callback: ItemTouchHelper.Callback = PlaylistCardMoveCallback(playlistAdapter::onRowMoved)
 			val touchHelper = ItemTouchHelper(callback)
 			touchHelper.attachToRecyclerView(recyclerView)
+
+			//获取并显示当前播放的媒体信息
 			playlistNowPlaying = playlistBottomSheet.findViewById(R.id.now_playing)
 			playlistNowPlaying!!.text = instance?.currentMediaItem?.mediaMetadata?.title
 			playlistNowPlayingCover = playlistBottomSheet.findViewById(R.id.now_playing_cover)
@@ -412,12 +435,15 @@ class FullBottomSheet(context: Context, attrs: AttributeSet?, defStyleAttr: Int,
 				crossfade(true)
 				error(R.drawable.ic_default_cover)
 			}
+
+			//设置 RecyclerView 的布局管理器、适配器，并滚动到当前播放的媒体条目位置
 			recyclerView.layoutManager = LinearLayoutManager(context)
 			recyclerView.adapter = playlistAdapter
 			recyclerView.scrollToPosition(playlistAdapter.playlist.first.indexOfFirst { i ->
 				i == (instance?.currentMediaItemIndex ?: 0)
 			})
 			recyclerView.fastScroll(null, null)
+			//处理 BottomSheetDialog消失事件
 			playlistBottomSheet.setOnDismissListener {
 				if (playlistNowPlaying != null) {
 					playlistNowPlayingCover!!.dispose()
@@ -425,6 +451,7 @@ class FullBottomSheet(context: Context, attrs: AttributeSet?, defStyleAttr: Int,
 					playlistNowPlaying = null
 				}
 			}
+			//显示bottomSheetDialog
 			playlistBottomSheet.show()
 
 
