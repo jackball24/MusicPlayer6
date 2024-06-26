@@ -31,6 +31,8 @@ class LastPlayedManager(context: Context,
     var allowSavingState = true
     private val prefs by lazy { context.getSharedPreferences("LastPlayedManager", 0) }
 
+
+    //该方法将当前播放列表及其相关信息保存到 MediaItemsWithStartPosition 对象中。
     private fun dumpPlaylist(): MediaItemsWithStartPosition {
         val items = mutableListOf<MediaItem>()
         for (i in 0 until controller.mediaItemCount) {
@@ -41,6 +43,7 @@ class LastPlayedManager(context: Context,
         )
     }
 
+    //清除保存的随机播放列表
     fun eraseShuffleOrder() {
         prefs.use(relax = true) {
             edit(commit = true) {
@@ -49,6 +52,11 @@ class LastPlayedManager(context: Context,
         }
     }
 
+    /*
+    该方法先检查是否允许保存状态，如果不允许则跳过。
+    获取当前播放列表数据、重复模式、随机播放模式、播放参数等信息。
+    使用协程在后台线程中将这些数据序列化并保存到 SharedPreferences。
+     */
     fun save() {
         if (!allowSavingState) {
             Log.i(TAG, "skipped save")
@@ -113,7 +121,12 @@ class LastPlayedManager(context: Context,
             }
         }
     }
-
+    /*
+    使用协程在后台线程中恢复播放状态。
+    反序列化保存的随机播放顺序。
+    如果 lastPlayedGrp 或 lastPlayedLst 为空，则调用回调函数并传入 null。
+    反序列化保存的播放列表和媒体元数据，更新播放器状态。
+     */
     fun restore(callback: (MediaItemsWithStartPosition?, CircularShuffleOrder.Persistent) -> Unit) {
 
         CoroutineScope(Dispatchers.Default).launch {
