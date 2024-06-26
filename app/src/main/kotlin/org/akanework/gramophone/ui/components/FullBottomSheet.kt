@@ -912,9 +912,12 @@ class FullBottomSheet(context: Context, attrs: AttributeSet?, defStyleAttr: Int,
 		if (duration != null && !isUserTracking) {
 			bottomSheetFullSeekBar.max = duration.toInt()
 			bottomSheetFullSeekBar.progress = instance?.currentPosition?.toInt() ?: 0
-			bottomSheetFullSlider.valueTo = duration.toFloat().coerceAtLeast(1f)
-			bottomSheetFullSlider.value =
-				min(instance?.currentPosition?.toFloat() ?: 0f, bottomSheetFullSlider.valueTo)
+			if(duration.toFloat() > 0.0){
+				bottomSheetFullSlider.valueTo = duration.toFloat().coerceAtLeast(1f)
+				bottomSheetFullSlider.value =
+					min(instance?.currentPosition?.toFloat() ?: 0f, bottomSheetFullSlider.valueTo)
+			}
+
 			bottomSheetFullPosition.text = position
 		}
 		updateLyric(duration)
@@ -1370,9 +1373,12 @@ class FullBottomSheet(context: Context, attrs: AttributeSet?, defStyleAttr: Int,
 			if (duration != null && !isUserTracking) {
 				bottomSheetFullSeekBar.max = duration.toInt()
 				bottomSheetFullSeekBar.progress = instance?.currentPosition?.toInt() ?: 0
-				bottomSheetFullSlider.valueTo = duration.toFloat()
-				bottomSheetFullSlider.value =
-					min(instance?.currentPosition?.toFloat() ?: 0f, bottomSheetFullSlider.valueTo)
+				//IllegalStateException:valueFrom(0.0) must be smaller than valueTo(0.0)
+				if(duration.toFloat() > 0.0){
+					bottomSheetFullSlider.valueTo = duration.toFloat()
+					bottomSheetFullSlider.value =
+						min(instance?.currentPosition?.toFloat() ?: 0f, bottomSheetFullSlider.valueTo)
+				}
 				bottomSheetFullPosition.text = position
 			}
 			//更新歌词显示

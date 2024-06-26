@@ -15,6 +15,7 @@ import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
 import android.util.Log
+import android.widget.Toast
 import androidx.concurrent.futures.CallbackToFutureAdapter
 import androidx.core.app.NotificationChannelCompat
 import androidx.core.app.NotificationCompat
@@ -25,6 +26,7 @@ import androidx.media3.common.C
 import androidx.media3.common.IllegalSeekPositionException
 import androidx.media3.common.MediaItem
 import androidx.media3.common.MediaMetadata
+import androidx.media3.common.PlaybackException
 import androidx.media3.common.Player
 import androidx.media3.common.Player.EVENT_SHUFFLE_MODE_ENABLED_CHANGED
 import androidx.media3.common.Timeline
@@ -33,6 +35,7 @@ import androidx.media3.common.util.BitmapLoader
 import androidx.media3.common.util.UnstableApi
 import androidx.media3.common.util.Util.isBitmapFactorySupportedMimeType
 import androidx.media3.exoplayer.DefaultRenderersFactory
+import androidx.media3.exoplayer.ExoPlaybackException
 import androidx.media3.exoplayer.ExoPlayer
 import androidx.media3.session.CommandButton
 import androidx.media3.session.DefaultMediaNotificationProvider
@@ -152,6 +155,37 @@ class GramophonePlaybackService : MediaLibraryService(), MediaSessionService.Lis
         }
     }
 
+    override fun onPlayerError(error: PlaybackException) {
+        // 处理播放错误
+        when (error) {
+            is ExoPlaybackException -> {
+                when (error.type) {
+                    ExoPlaybackException.TYPE_SOURCE -> {
+                        // 处理源错误，如文件损坏或格式不支持
+                        Log.e("PlayerError", "Source error: ${error.sourceException.message}")
+                        Toast.makeText(this, "无法播放该文件，请检查文件是否损坏或格式是否支持！！！", Toast.LENGTH_LONG).show()
+                    }
+                    ExoPlaybackException.TYPE_RENDERER -> {
+                        // 处理渲染错误
+                        Log.e("PlayerError", "渲染解析错误: ${error.rendererException.message}")
+                    }
+                    ExoPlaybackException.TYPE_UNEXPECTED -> {
+                        // 处理意外错误
+                        Log.e("PlayerError", "未知原因导致的意外错误: ${error.unexpectedException.message}")
+                    }
+                    ExoPlaybackException.TYPE_REMOTE -> {
+                        // 处理远程错误
+                        Log.e("PlayerError", "Remote error")
+                    }
+                }
+            }
+            else-> {
+                // 处理非 ExoPlaybackException 的错误
+                Log.e("PlayerError", "Playback error: ${error.message}")
+                Toast.makeText(this, "出现其他错误：${error.message}", Toast.LENGTH_LONG).show()
+            }
+        }
+    }
     @OptIn(ExperimentalCoilApi::class)
     override fun onCreate() {
         handler = Handler(Looper.getMainLooper())

@@ -34,7 +34,7 @@
             android:insetRight="0dp"
             android:insetBottom="0dp"
             android:visibility="gone"
-            app:icon="@drawable/media3_icon_playlist_add"
+            app:icon="@drawable/ic_playlist_add"
             app:iconGravity="textStart"
             app:iconPadding="0dp"
             app:iconSize="26dp"

@@ -43,6 +43,7 @@ android {
 
     buildFeatures {
         buildConfig = true
+        viewBinding = true
     }
 
     packaging {
@@ -84,7 +85,7 @@ android {
         minSdk = 21
         targetSdk = 34
         versionCode = 10
-        versionName = "1.0.8"
+        versionName = "1.0.0"
         if (releaseType != "Release") {
             versionNameSuffix = myVersionName
         }

@@ -4,6 +4,9 @@
         android:id="@+id/play_next"
         android:title="@string/play_next" />
     <item
+        android:id="@+id/add"
+        android:title="@string/add" />
+    <item
         android:id="@+id/details"
         android:title="@string/details" />
 
