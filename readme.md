@@ -71,7 +71,7 @@
 
 ## 截图
 
-| ![image-20240626182231336](https://cdn.jsdelivr.net/gh/jackball24/Myblog_pic@main/202406261822477.png) | ![image-20240626182358138](https://cdn.jsdelivr.net/gh/jackball24/Myblog_pic@main/202406261823264.png) | ![image-20240626182611481](https://cdn.jsdelivr.net/gh/jackball24/Myblog_pic@main/202406261826545.png) |
+| ![image-20240626182231336](https://cdn.jsdelivr.net/gh/jackball24/Myblog_pic@main/202406261822477.png) | ![image-20240626182358138](https://cdn.jsdelivr.net/gh/jackball24/Myblog_pic@main/202406261823264.png) | ![image-20240626194600368](https://cdn.jsdelivr.net/gh/jackball24/Myblog_pic@main/202406261946487.png) |
 | ------------------------------------------------------------ | ------------------------------------------------------------ | ------------------------------------------------------------ |
 | ![image-20240626182703759](https://cdn.jsdelivr.net/gh/jackball24/Myblog_pic@main/202406261827948.png) | ![image-20240626182800735](https://cdn.jsdelivr.net/gh/jackball24/Myblog_pic@main/202406261828813.png) | ![image-20240626183001958](https://cdn.jsdelivr.net/gh/jackball24/Myblog_pic@main/202406261830073.png) |
 | ![image-20240626183143293](https://cdn.jsdelivr.net/gh/jackball24/Myblog_pic@main/202406261831355.png) | ![image-20240626183220955](https://cdn.jsdelivr.net/gh/jackball24/Myblog_pic@main/202406261832087.png) | ![image-20240626183318214](https://cdn.jsdelivr.net/gh/jackball24/Myblog_pic@main/202406261833275.png) |
