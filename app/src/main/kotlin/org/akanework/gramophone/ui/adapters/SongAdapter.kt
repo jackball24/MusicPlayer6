@@ -1,7 +1,10 @@
 package org.akanework.gramophone.ui.adapters
 
+import android.content.ContentValues
 import android.net.Uri
+import android.provider.MediaStore
 import android.view.View
+import android.widget.Toast
 import androidx.appcompat.widget.PopupMenu
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
@@ -9,11 +12,13 @@ import androidx.lifecycle.MutableLiveData
 import androidx.media3.common.C
 import androidx.media3.common.MediaItem
 import androidx.media3.common.Player
+import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import org.akanework.gramophone.R
+import org.akanework.gramophone.logic.utils.MediaStoreUtils
 import org.akanework.gramophone.ui.LibraryViewModel
 import org.akanework.gramophone.ui.MediaControllerViewModel
 import org.akanework.gramophone.ui.components.NowPlayingDrawable
@@ -220,11 +225,82 @@ class SongAdapter(
                     }
                     true
                 }
-
+                R.id.addtoList ->{
+                    addToPlaylist(item)
+                    true
+                }
 
                 else -> false
             }
         }
+    }
+
+    private fun addToPlaylist(item: MediaItem) {
+        // 过滤掉ID为-1的播放列表和标题为"收藏"的播放列表
+        val filteredPlaylists = viewModel.playlistList.value?.filter {
+            it.id != -1L && !it.title.equals("收藏", ignoreCase = true)
+        }
+
+        val playlistNames = filteredPlaylists?.map { it.title ?: "Unknown Playlist" }?.toTypedArray()
+        val selectedPlaylistIds = ArrayList<Long>()
+        MaterialAlertDialogBuilder(context)
+            .setTitle("添加至歌单")
+            .setMultiChoiceItems(playlistNames, null) { _, which, isChecked ->
+                if (isChecked) {
+                    val selectedPlaylist = filteredPlaylists?.get(which)
+                    selectedPlaylist?.let { targetPlaylist ->
+                        selectedPlaylistIds.add(targetPlaylist.id)
+                    }
+                }
+            }
+            .setPositiveButton("确认") { _, _ ->
+                // 循环遍历选中的歌单ID，并将歌曲添加到每个歌单中
+                selectedPlaylistIds.forEach { playlistId ->
+                    val targetPlaylist = filteredPlaylists?.find { it.id == playlistId }
+                    targetPlaylist?.let { selectedPlaylist ->
+                        // 检查歌单中是否已包含该歌曲
+                        if (!selectedPlaylist.songList.contains(item)) {
+                            val resolver = context.contentResolver
+                            val values = ContentValues().apply {
+                                @Suppress("DEPRECATION")
+                                put(MediaStore.Audio.Playlists.Members.AUDIO_ID, item.mediaId.toLong())
+                                @Suppress("DEPRECATION")
+                                put(MediaStore.Audio.Playlists.Members.PLAY_ORDER, 0) // 可以根据实际情况设置播放顺序
+                            }
+
+                            val uri = resolver.insert(
+                                @Suppress("DEPRECATION")
+                                MediaStore.Audio.Playlists.Members.getContentUri("external", playlistId),
+                                values
+                            )
+
+                            // 检查插入是否成功，并根据需要更新界面或显示消息
+                            if (uri != null) {
+                                val updatedPlaylist = viewModel.playlistList.value?.map { playlist ->
+                                    if (playlist.id == playlistId) {
+                                        // 更新目标播放列表中的歌曲列表
+                                        val updatedSongList = playlist.songList.toMutableList().apply {
+                                            add(item)
+                                        }
+                                        MediaStoreUtils.Playlist(playlist.id, playlist.title, updatedSongList)
+                                    } else {
+                                        playlist
+                                    }
+                                }
+                                viewModel.playlistList.postValue(updatedPlaylist)
+                                // 显示消息
+                                Toast.makeText(context, "歌曲成功添加至歌单 ${selectedPlaylist.title}", Toast.LENGTH_SHORT).show()
+                            } else {
+                                Toast.makeText(context, "添加至歌单 ${selectedPlaylist.title} 失败", Toast.LENGTH_SHORT).show()
+                            }
+                        } else {
+                            Toast.makeText(context, "歌曲已在歌单 ${selectedPlaylist.title} 中", Toast.LENGTH_SHORT).show()
+                        }
+                    }
+                }
+            }
+            .setNegativeButton("取消", null)
+            .show()
     }
 
     override fun onBindViewHolder(holder: ViewHolder, position: Int, payloads: MutableList<Any>) {
