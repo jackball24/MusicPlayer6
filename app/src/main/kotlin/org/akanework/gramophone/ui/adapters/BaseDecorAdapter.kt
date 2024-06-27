@@ -201,13 +201,6 @@ open class BaseDecorAdapter<T : BaseAdapter<*>>(
         holder.addtoList.setOnClickListener {
             if(adapter is PlaylistAdapter){
                 PlaylistAdapter.createNewPlaylist(this.context) {
-                    if (context is MainActivity) {
-                        context.updateLibrary {
-                            // 在这里执行您的刷新逻辑
-                            holder.itemView.invalidate()
-                            adapter.notifyDataSetChanged()
-                        }
-                    }
                 }
             }
         }
