@@ -6,7 +6,9 @@
 
 大三下实践周Android应用开发，使用kotlin语言，项目为-音乐播放器应用。
 
-本项目由旧项目（于2024.6.17发布任务便构建-已废弃）[jackball24/MusicPlayer: v0.0.1 (github.com)](https://github.com/jackball24/MusicPlayer)移植至此，故团队成员的协作开发历史有所欠缺。
+本项目基于[留声机应用](https://github.com/AkaneTan/Gramophone)，由于不是完全在原项目上开发，故此创建了自己的Repository，感谢AkaneTan以及其他Contributors。
+
+我们在此项目基础上作了许多功能的修改和实践要求功能的增添，仍有许多不足之处，未来还有待改进。
 
 本次有多个项目可供选择，其中联系人应用是本学期课程的大作业，已经较好地实现了，~~我们团队表示不屑一顾，不想随大流~~，故选择多媒体方向的应用，既是挑战，也是很有趣的探索~
 
