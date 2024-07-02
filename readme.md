@@ -2,15 +2,11 @@
 
 ![GitHub](https://img.shields.io/github/license/AkaneTan/Gramophone?style=flat-square&logoColor=white&labelColor=black&color=white)
 
-一个优雅、轻量级的本地音乐播放器，使用 media3 和 material 3 design构建，严格遵循 android 开发的标准。
+一个优雅、轻量级的本地音乐播放器，使用 Media3 和 Material Design 3 构建，严格遵循 Android 开发的标准。
 
-大三下实践周Android应用开发，使用kotlin语言，项目为-音乐播放器应用。
+大三下实践周 Android 应用开发，使用 Kotlin 语言，项目为--音乐播放器应用。
 
-本项目基于[留声机应用](https://github.com/AkaneTan/Gramophone)，由于不是完全在原项目上开发，故此创建了自己的Repository，感谢AkaneTan以及其他Contributors。
 
-我们在此项目基础上作了许多功能的修改和实践要求功能的增添，仍有许多不足之处，未来还有待改进。
-
-本次有多个项目可供选择，其中联系人应用是本学期课程的大作业，已经较好地实现了，~~我们团队表示不屑一顾，不想随大流~~，故选择多媒体方向的应用，既是挑战，也是很有趣的探索~
 
 ## 特色
 
@@ -20,11 +16,11 @@
 
 - 支持专辑封面，支持卡片式列表切换
 
-- 支持音频文件内嵌歌词和外部lrc等歌词文件，同时可以同步歌词
+- 支持音频文件内嵌歌词和外部 lrc 等歌词文件，同时可以同步歌词
 
 - 支持多种不同的播放模式，如随机模式生成一个随机的歌曲播放队列
 
-- media3-exoplayer进行播放控制，响应快速
+- media3-exoplayer 进行播放控制，响应快速
 
 - 性能良好，占用系统资源极少
 
@@ -98,6 +94,10 @@
 
 
 ## 感谢
+
+本项目基于[留声机应用](https://github.com/AkaneTan/Gramophone)，由于不是完全在原项目上开发，故此创建了自己的Repository，感谢AkaneTan以及其他Contributors。
+
+我们在此项目基础上作了许多功能的修改和实践要求功能的增添，仍有许多不足之处，未来还有待改进。
 
 感谢以下项目带来的灵感：
 
